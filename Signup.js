@@ -2,33 +2,45 @@
 
 import { React, Component} from 'react';
 
-class SUComp extends Component{
-    constructor(props){
-        super(props)
-        this.navigation = props.navigation
-        this.route = props.route
-    }
-    render(){
-        return(
-            <div>
-                <label id = 'fname'>First Name: </label>
-                <input type = 'text' id = 'fname' className = 'signup'></input>
-                <br />
-                <label id = 'lname'>Last Name: </label>
-                <input type = 'text' id = 'lname' className = 'signup'></input>
-                <br />
-                <label id = 'email'>Email: </label>
-                <input type = 'email' id = 'email' className = 'signup' value = {this.route.params.email}></input>
-                <br />
-                <label id = 'pw'>Password: </label>
-                <input type = 'text' id = 'pw' className = 'signup'></input>
-            </div>
-        )
-    }
-}
-
 export default function Signup({navigation, route}){
+
+    const signUpUser = async (username, fName, lName, email, pass) => {       
+        const body = {
+            username: username,
+            firstname: fName,
+            lastname: lName,
+            email: email,
+            password: pass
+        }
+    
+        let response = await fetch('http://localhost:3001/createUser', {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type':'application/json'},
+            body: JSON.stringify(body)
+        }).then(function(resp){
+            return resp.json()
+        })
+        console.log(response)
+    }
+
     return(
-        <SUComp navigation = {navigation} route = {route} />
+        <div>
+            <label id = 'fnameL'>First Name: </label>
+            <input type = 'text' id = 'fName' className = 'signup'></input>
+            <br />
+            <label id = 'lnameL'>Last Name: </label>
+            <input type = 'text' id = 'lName' className = 'signup'></input>
+            <br />
+            <label id = 'emailL'>Email: </label>
+            <input type = 'text' id = 'emailI' className = 'signup'></input>
+            <br />
+            <label id = 'unameL'>Username: </label>
+            <input type = 'text' id = 'uName' className = 'signup'></input>
+            <br />
+            <label id = 'pwL'>Password: </label>
+            <input type = 'text' id = 'pw' className = 'signup'></input>
+            <button onClick = {() => signUpUser(document.getElementById('uName').value, document.getElementById('fName').value, document.getElementById('lName').value, document.getElementById('emailI').value, document.getElementById('pw').value)}>Sign Up</button>
+        </div>
     )
 }

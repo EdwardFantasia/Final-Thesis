@@ -7,19 +7,20 @@ import { FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, Toucha
 /*API: https://rapidapi.com/brianliong1999-aAas5mGoYZv/api/advanced-exercise-finder */
 
 //TODO: need to add in some randomization element (just add in a radio button that would allow for randomiztion, save that into account exercise data)
-//TODO: add delete exercise functionality on WorkoutGeneratComp
 //TODO: collabsible needs to be highlightable as well to show which one is going to be added to workout
 //TODO: see what changing all selects to dropdowns will do
 //TODO: create tag creation system where there is a dictionary of all exercises 
 //TODO: Add X to top of Modal (change Modal return to just return a state variable and just change state variable with X at top to close)
+//TODO: need to reset modal after request
+//TODO: need to create error 
 
 class WorkoutModalComp extends Component{
     constructor(props){
         super(props)
         this.state = {
-            screenState: 0,
-            errorHidden: true,
-            selectedExcs: [], 
+            screenState: 0, //Sets the modal screen being rendered
+            errorHidden: true, //going to set whether error is hidden based on if at least PMG is set
+            selectedExcs: [], //Holds all selected exercises that are going to be added to workout
             query: {
                 equipment: "",
                 force: "",
@@ -31,10 +32,10 @@ class WorkoutModalComp extends Component{
                 secondaryMuscles: [],
                 tags: [],
                 type: ""
-            }
+            } //holds info that is being used as request to Advanced Exercise Finder API
         }
-        this.addFunc = props.addFunc
-        this.addToWorkData = props.addToWorkData
+        this.addFunc = props.addFunc //add(to array) function from Generat
+        this.addToWorkData = props.addToWorkData //function that adds exercises to array that holds workout exercises
         this.excsByGroup = {
             back: ["Trapezius", "Erector Spinae", "Latissimus Dorsi"],
             chest: ["Upper Chest", "Lower Chest", "Pectoralis Minor"],
@@ -42,24 +43,25 @@ class WorkoutModalComp extends Component{
             arms: ["Triceps", "Biceps", "Pronators", "Supinators", "Forearm Flexors", "Forearm Extensors", "Brachioradialis"],
             legs: ["Quadriceps", "Hamstrings", "Calves", "Adductors", "Abductors", "Gluteal Muscles"],
             core: ["Obliques", "Transverse Abdominis", "Rectus Absominis"]
-        }
-        this.pmChecks = []
-        this.smChecks = []
+        } //holds muscles that are to be worked out based on what PMGs are selected
 
-        this.secondaryDisplay
+        this.pmChecks = [] //holds what muscles will be able to be checked based on PMGs checked
+        this.smChecks = [] //holds what muscles will be able to be checked based on SMGs checked
 
-        this.queryResults = []
+        this.secondaryDisplay  //used to determine whether secondaryMuscles will be displayed
+
+        this.queryResults = [] //holds result of api query request
     }
 
     queryCreation(queryParam){
-        if((typeof this.state.query[queryParam] == "string" && this.state.query[queryParam] != "") || (this.state.query[queryParam].length != 0)){
-            if(typeof this.state.query[queryParam] == "string"){
-                return queryParam + ": \"" + this.state.query[queryParam] + "\", "
+        if((typeof this.state.query[queryParam] == "string" && this.state.query[queryParam] != "") || (this.state.query[queryParam].length != 0)){ //if this field of query is either a non-empty string or a non-empty array...
+            if(typeof this.state.query[queryParam] == "string"){ //if a string...
+                return queryParam + ": \"" + this.state.query[queryParam] + "\", " //add the query param formatted to be accepted by API
             }
             else{
                 let temp = ""
-                for(let i = 0; i < this.state.query[queryParam].length; i++){
-                    temp += '"' + this.state.query[queryParam][i] + '", '
+                for(let i = 0; i < this.state.query[queryParam].length; i++){ //for each item in query param array...
+                    temp += '"' + this.state.query[queryParam][i] + '", ' //
                 }
                 return queryParam + ": [" + temp + "]"
             }
@@ -80,6 +82,7 @@ class WorkoutModalComp extends Component{
                 exercises(
                     exerciseQuery: {` + queryString + `}
                     ) {
+                    id
                     name
                     force
                     equipment
@@ -119,6 +122,10 @@ class WorkoutModalComp extends Component{
     }
 
     async screenEst(screenNum){
+        /**
+         * Establishes modal screen information for screenNum screen
+         * @param {Number} screenNum: number to set modal screen to
+         */
         switch(screenNum){
             case 3:
                 {/*Map this and get every exc related to muscGroup*/}
@@ -132,8 +139,14 @@ class WorkoutModalComp extends Component{
         this.setState({screenState: screenNum})
     }
 
-    queryStringChange(objParam, radVal, radNum){ //TODO: look for unnecessary .toLowerCase functions
-        if(objParam != 'equipment'){
+    queryStringChange(objParam, radVal, radNum){ //TODO: look for unnecessary .toLowerCase functions, look for a way to not need to use radVal (just use the actual val from button)
+        /**
+         * Changes the radNum radio button of objParam and sets field of query state varaible relating to objParam to radVal
+         * @param {String} objParam: field to edit
+         * @param {String} radVal: value to set query[objParam] to
+         * @param {Number} radNum: radio number to edit
+         */
+        if(objParam != 'equipment'){ //equipment disqualified due to dropdown
             if(this.state.query[objParam].toLowerCase() == radVal.toLowerCase()){
                 document.getElementsByName(objParam)[radNum].checked = false
                 this.state.query[objParam] = ""
@@ -277,7 +290,7 @@ class WorkoutModalComp extends Component{
         else if (this.state.screenState == 4){ {/*Results Page*/}
             return(
                 <SafeAreaView style = {{flex: 1, height: screen.height}}>
-                    <FlatList data = {this.queryResults} renderItem={({item: query}) => <ExerciseInfo addToSelected = {() => this.addFunc(this.state.selectedExcs, query)} exerciseData = {query}/>}>
+                    <FlatList data = {this.queryResults} renderItem={({item: query}) => <ExerciseInfo hideCheck = {false} addToSelected = {() => this.addFunc(this.state.selectedExcs, query)} exerciseData = {query}/>}>
                     </FlatList>
                     <Button onClick = {() => this.addToWorkData(this.state.selectedExcs)}>Add Selected Exercise(s) to Workout</Button>
                 </SafeAreaView>

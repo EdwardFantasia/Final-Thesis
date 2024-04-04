@@ -7,12 +7,14 @@ class ExerciseInfo extends Component{
         super(props)
         this.exerciseData = props.exerciseData
         this.addToSelected = props.addToSelected
+        this.hideCheck = props.hideCheck
     }
 
     render(){
         return(
             <div>
-                <CollapsibleView title = {<div><p>{this.exerciseData.name}</p> <input onClick = {() => this.addToSelected()} type = 'checkbox'></input></div>}>
+                <input hidden = {this.hideCheck} onClick = {() => this.addToSelected()} type = 'checkbox'></input>
+                <CollapsibleView title = {<p>{this.exerciseData.name}</p>}>
                     <View>
                         <p>{this.exerciseData.instructions}</p>
                     </View>

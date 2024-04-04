@@ -1,29 +1,24 @@
 import { React, Component} from 'react';
 import './css/Workout.css'
-import Exercise from './Exercise';
+import ExerciseInfo from './ExerciseInfo';
 
-class WorkoutComp extends Component{
-    constructor(props){
-        super(props)
-        this.route = props.route
-        this.navigation = props.navigation
-        this.workout = props.workout
-        this.exercises = this.workout.exercises.map((curExc, excNum) => {
-            return(
-                <Exercise exercise = {curExc}></Exercise>
-            )
-        })
-    }
+const WorkoutComp = props => {
+    const route = props.route
+    const navigation = props.navigation
+    const workout = props.workout
+    const exercises = workout.exercises
 
-    render(){
-        return(
-            <div id = "workout">
-                <h3>{this.workout.name}</h3>
-                <h4>{this.workout.desc}</h4>
-                {this.exercises}
-            </div>
-        )
-    }
+    return(
+        <div id = 'workout'>
+            <h3>{workout.workoutName}</h3>
+            <h4>{workout.workoutDesc}</h4>
+            {exercises.map(excData => {
+                return(
+                    <ExerciseInfo exerciseData = {excData} addToSelected = {null} hidden = {'hidden'}></ExerciseInfo>
+                )
+            })}
+        </div>
+    )
 }
 
 export default function Workout({navigation, route, workout}){

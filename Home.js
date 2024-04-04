@@ -10,7 +10,7 @@ export default function Home({navigation, route}){
         if (navigation.isFocused()){
             setWorkouts(route.params.workouts)
         }
-        }, [navigation.isFocused()])
+    })
 
     return(
         <div>
