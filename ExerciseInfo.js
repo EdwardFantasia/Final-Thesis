@@ -1,6 +1,7 @@
 import { Component } from "react";
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
-import {View} from 'react-native'
+import {View, Text, TextInput} from 'react-native'
+import BouncyCheckbox from 'react-native-bouncy-checkbox'
 
 class ExerciseInfo extends Component{
     constructor(props){
@@ -12,14 +13,14 @@ class ExerciseInfo extends Component{
 
     render(){
         return(
-            <div>
-                <input hidden = {this.hideCheck} onClick = {() => this.addToSelected()} type = 'checkbox'></input>
-                <CollapsibleView title = {<p>{this.exerciseData.name}</p>}>
+            <View>
+                <BouncyCheckbox hidden = {this.hideCheck} onPress = {() => this.addToSelected()}></BouncyCheckbox>
+                <CollapsibleView title = {<Text>{this.exerciseData.name}</Text>}>
                     <View>
-                        <p>{this.exerciseData.instructions}</p>
+                        <Text>{this.exerciseData.instructions}</Text>
                     </View>
                 </CollapsibleView>
-            </div>
+            </View>
         )
     }
 }

@@ -1,67 +1,61 @@
-import { React, Component} from 'react';
-import './css/WorkoutGen.css'
-import { Modal, Button } from 'react-bootstrap'; //change these to react native versions
+import { React, Component, useState, useRef} from 'react';
+//import './css/WorkoutGen.css'
 import ExerciseInfo from './ExerciseInfo';
-import { FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, Alert } from 'react-native';
+import { Button, FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, Alert, TextInput } from 'react-native';
+import RadioButton from 'react-native-paper'
+import BouncyCheckbox from 'react-native-bouncy-checkbox'
+import {SelectList, MultipleSelectList} from 'react-native-dropdown-select-list'
 
 /*API: https://rapidapi.com/brianliong1999-aAas5mGoYZv/api/advanced-exercise-finder */
 
-//TODO: need to add in some randomization element (just add in a radio button that would allow for randomiztion, save that into account exercise data)
-//TODO: collabsible needs to be highlightable as well to show which one is going to be added to workout
-//TODO: see what changing all selects to dropdowns will do
-//TODO: create tag creation system where there is a dictionary of all exercises 
+//TODO: need to add in some randomization element (just add in a radio button that would allow for randomization, ask for level of randomization (low, med, high), then save that into account exercise data)
+//TODO: create tag creation system where there is a dictionary of all exercises (ok to not implement and just use a profile search)
 //TODO: Add X to top of Modal (change Modal return to just return a state variable and just change state variable with X at top to close)
 //TODO: need to reset modal after request
-//TODO: need to create error 
+//TODO: need to create error for when primaryMuscleGroup is empty
 
-class WorkoutModalComp extends Component{
-    constructor(props){
-        super(props)
-        this.state = {
-            screenState: 0, //Sets the modal screen being rendered
-            errorHidden: true, //going to set whether error is hidden based on if at least PMG is set
-            selectedExcs: [], //Holds all selected exercises that are going to be added to workout
-            query: {
-                equipment: "",
-                force: "",
-                movement: "",
-                primaryMuscleGroups: [],
-                primaryMuscles: [],
-                search: "",
-                secondaryMuscleGroups: [],
-                secondaryMuscles: [],
-                tags: [],
-                type: ""
-            } //holds info that is being used as request to Advanced Exercise Finder API
-        }
-        this.addFunc = props.addFunc //add(to array) function from Generat
-        this.addToWorkData = props.addToWorkData //function that adds exercises to array that holds workout exercises
-        this.excsByGroup = {
-            back: ["Trapezius", "Erector Spinae", "Latissimus Dorsi"],
-            chest: ["Upper Chest", "Lower Chest", "Pectoralis Minor"],
-            shoulders: ["Anterior Deltoid", "Lateral Deltoid", "Posterior Deltoid"],
-            arms: ["Triceps", "Biceps", "Pronators", "Supinators", "Forearm Flexors", "Forearm Extensors", "Brachioradialis"],
-            legs: ["Quadriceps", "Hamstrings", "Calves", "Adductors", "Abductors", "Gluteal Muscles"],
-            core: ["Obliques", "Transverse Abdominis", "Rectus Absominis"]
-        } //holds muscles that are to be worked out based on what PMGs are selected
+export default function WorkoutModalComponent(props){
+    const addFunc = props.addFunc
+    const addToWorkData = props.addToWorkData
+    const setShow = props.setShow
+    const [screenState, setScreen] = useState(0)
+    const [errorHidden, setErrorH] = useState(true)
+    const [selectedExcs, setSelectedExcs] = useState([])
+    const [selectedPMG, setSPMG] = useState([])
+    const [selectedSMG, setSSMG] = useState([])
+    const [selectedPM, setSPM] = useState([])
+    const [selectedSM, setSSM] = useState([])
+    const [tags, setST] = useState([])
+    let query = useRef({
+        equipment: "",
+        force: "",
+        movement: "",
+        search: "",
+        type: ""
+    })
 
-        this.pmChecks = [] //holds what muscles will be able to be checked based on PMGs checked
-        this.smChecks = [] //holds what muscles will be able to be checked based on SMGs checked
-
-        this.secondaryDisplay  //used to determine whether secondaryMuscles will be displayed
-
-        this.queryResults = [] //holds result of api query request
+    const excsByGroup = {
+        back: ["Trapezius", "Erector Spinae", "Latissimus Dorsi"],
+        chest: ["Upper Chest", "Lower Chest", "Pectoralis Minor"],
+        shoulders: ["Anterior Deltoid", "Lateral Deltoid", "Posterior Deltoid"],
+        arms: ["Triceps", "Biceps", "Pronators", "Supinators", "Forearm Flexors", "Forearm Extensors", "Brachioradialis"],
+        legs: ["Quadriceps", "Hamstrings", "Calves", "Adductors", "Abductors", "Gluteal Muscles"],
+        core: ["Obliques", "Transverse Abdominis", "Rectus Absominis"]
     }
 
-    queryCreation(queryParam){
-        if((typeof this.state.query[queryParam] == "string" && this.state.query[queryParam] != "") || (this.state.query[queryParam].length != 0)){ //if this field of query is either a non-empty string or a non-empty array...
-            if(typeof this.state.query[queryParam] == "string"){ //if a string...
-                return queryParam + ": \"" + this.state.query[queryParam] + "\", " //add the query param formatted to be accepted by API
+    let pmChecks = useRef([])
+    let smChecks = useRef([])
+    let queryResults = useRef([])
+
+    const queryCreation = queryParam => {
+        if((typeof query.current[queryParam] == "string" && query.current[queryParam] != "") || (query.current[queryParam].length != 0)){ //if this field of query is either a non-empty string or a non-empty array...
+            if(typeof query.current[queryParam] == "string"){ //if a string...
+                return queryParam + ": \"" + query.current[queryParam].toLowerCase() + "\", " //add the query param formatted to be accepted by API
             }
             else{
                 let temp = ""
-                for(let i = 0; i < this.state.query[queryParam].length; i++){ //for each item in query param array...
-                    temp += '"' + this.state.query[queryParam][i] + '", ' //
+                for(let i = 0; i < query.current[queryParam].length; i++){ //for each item in query param array...
+                    temp += '"' + query.current[queryParam][i].toLowerCase() + '", ' //
                 }
                 return queryParam + ": [" + temp + "]"
             }
@@ -71,13 +65,20 @@ class WorkoutModalComp extends Component{
         }   
     }
 
-    async getExercises(){
+    const getExercises = async() => {
         let queryString = ""
-        for(let i = 0; i < Object.keys(this.state.query).length; i++){
-            queryString += this.queryCreation(Object.keys(this.state.query)[i])
+        console.log(selectedPMG)
+        query.current.primaryMuscleGroups = selectedPMG
+        query.current.secondaryMuscleGroups = selectedSMG
+        query.current.primaryMuscles = selectedPM
+        query.current.secondaryMuscles = selectedSM
+        query.current.tags = tags
+        console.log(query.current)
+        for(let i = 0; i < Object.keys(query.current).length; i++){
+            queryString += queryCreation(Object.keys(query.current)[i])
         }
 
-        const query = `
+        const queryReq = `
             query {
                 exercises(
                     exerciseQuery: {` + queryString + `}
@@ -93,11 +94,11 @@ class WorkoutModalComp extends Component{
                     secondaryMuscles
                     tags
                     type
-                  }
+                }
             }
         `
 
-        console.log(JSON.stringify({query:query}))
+        console.log(JSON.stringify({query:queryReq}))
 
         const url = 'https://advanced-exercise-finder.p.rapidapi.com/'
         const options = {
@@ -107,21 +108,21 @@ class WorkoutModalComp extends Component{
 		        'x-rapidapi-host': 'advanced-exercise-finder.p.rapidapi.com',
 		        'Content-Type': 'application/json'
             },
-            body: JSON.stringify({query:query})
+            body: JSON.stringify({query:queryReq})
         }
 
         try {
 	        let response = await fetch(url, options);
-	        this.queryResults = JSON.parse(await response.text())['data']['exercises']
+	        queryResults.current = JSON.parse(await response.text())['data']['exercises']
 
-            console.log(this.queryResults)
-            this.setState({screenState: 4})
+            console.log(queryResults)
+            setScreen(4)
         } catch (error) {
 	        console.error(error);
         }
     }
 
-    async screenEst(screenNum){
+    const screenEst = async(screenNum) => {
         /**
          * Establishes modal screen information for screenNum screen
          * @param {Number} screenNum: number to set modal screen to
@@ -129,38 +130,16 @@ class WorkoutModalComp extends Component{
         switch(screenNum){
             case 3:
                 {/*Map this and get every exc related to muscGroup*/}
-                this.state.query['primaryMuscleGroups'].map((muscGroup) => {
-                    this.pmChecks = this.pmChecks.concat(this.excsByGroup[muscGroup])
+                selectedPMG.map((muscGroup) => {
+                    pmChecks.current = pmChecks.current.concat(excsByGroup[muscGroup.toLowerCase()])
                 })
-                this.state.query['secondaryMuscleGroups'].map((sMuscGroup) => {
-                    this.smChecks = this.smChecks.concat(this.excsByGroup[sMuscGroup])
+                selectedSMG.map((sMuscGroup) => {
+                    smChecks.current = smChecks.current.concat(excsByGroup[sMuscGroup.toLowerCase()])
                 })
         }
-        this.setState({screenState: screenNum})
+        setScreen(screenNum)
     }
 
-    queryStringChange(objParam, radVal, radNum){ //TODO: look for unnecessary .toLowerCase functions, look for a way to not need to use radVal (just use the actual val from button)
-        /**
-         * Changes the radNum radio button of objParam and sets field of query state varaible relating to objParam to radVal
-         * @param {String} objParam: field to edit
-         * @param {String} radVal: value to set query[objParam] to
-         * @param {Number} radNum: radio number to edit
-         */
-        if(objParam != 'equipment'){ //equipment disqualified due to dropdown
-            if(this.state.query[objParam].toLowerCase() == radVal.toLowerCase()){
-                document.getElementsByName(objParam)[radNum].checked = false
-                this.state.query[objParam] = ""
-            }
-            else{
-                this.state.query[objParam] = radVal.toLowerCase()
-            }
-        }
-        else{
-            this.state.query['equipment'] = radVal.toLowerCase()
-        }
-    }
-        
-    render(){
         {/*API QUERY PARAMS (* = required from APP):
         Name: string
         Equipment: string,
@@ -174,129 +153,202 @@ class WorkoutModalComp extends Component{
         Type: string
         */}
 
-        if(this.state.screenState == 0){
+        if(screenState == 0){
             return(
-            <div>
-                <Button onClick={() => this.setState({screenState: 1})}>Create Workout</Button>
-                <Button onClick={() => this.setState({screenState: 2})}>Import Workout</Button>
-            </div>
+            <SafeAreaView style = {{
+                //source: https://reactnative.dev/docs/modal
+                margin: 20,
+                backgroundColor: 'white',
+                borderRadius: 20,
+                padding: 35,
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                elevation: 5,
+              }}>
+                <Button title = "Create Workout" onPress={() => setScreen(1)} />
+                <Button title = "Import Workout" onPress={() => setScreen(2)} />
+            </SafeAreaView>
         )
-        }else if(this.state.screenState == 1){
+        }else if(screenState == 1){
             {/*Return create workout modal page*/}
             return(
-            <div>
-                <label for = 'excName'>Exercise Name</label>
-                <input type = 'text' id = 'excName' name = 'excName'></input>
-                <label for = 'excDesc'>Exercise Description</label>
-                <input type = 'text' id = 'excDesc' name = 'excDesc'></input>
-                <label for = 'sets'>Sets: </label>
-                <input type = 'number' id = 'sets' name = 'sets'></input>
-                <label for = 'sets'>Reps: </label>
-                <input type = 'number' id = 'reps' name = 'reps'></input>
-                <Button>Save Exercise</Button>
-            </div>
+            <SafeAreaView style = {{
+                //source: https://reactnative.dev/docs/modal
+                margin: 20,
+                backgroundColor: 'white',
+                borderRadius: 20,
+                padding: 35,
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                elevation: 5,
+              }}>
+                <Text>Exercise Name</Text>
+                <TextInput id = 'excName'></TextInput>
+                <Text>Exercise Description</Text>
+                <TextInput id = 'excDesc'></TextInput>
+                <Text>Sets: </Text>
+                <TextInput id = 'sets'></TextInput>
+                <Text>Reps: </Text>
+                <TextInput id = 'reps'></TextInput>
+                <Button title = "Save Exercise" />
+            </SafeAreaView>
         )
         }
-        else if (this.state.screenState == 2){
+        else if (screenState == 2){
             {/*First page of import workout sequence*/}
             return(
-                <div>
-                    <p>Any keywords you wish to search for?</p>
-                    <input></input>
+                <SafeAreaView style = {{
+                    //source: https://reactnative.dev/docs/modal
+                    margin: 20,
+                    backgroundColor: 'white',
+                    borderRadius: 20,
+                    padding: 35,
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}>
+                    <Text>Any keywords you wish to search for?</Text>
+                    <TextInput></TextInput>
 
-                    <p>Choose what equipment you wish to use for this exercise</p>
-                    <select onClick={() => this.queryStringChange('equipment', document.getElementById('equip').value, null)} name = 'equip' id = 'equip'>
-                    {["None", "Barbell", "Dumbells", "Machine", "Cable", "Kettlebell", "Resistance Band", "Resistance Band Assisted", "EZ Curl Barbell", "Trap Bar", "Smith Machine", "Body Weight", "Weighted", "Misc"].map((equip) => {
-                        return(
-                            <option value = {equip}>{equip}</option>
-                        )
-                    })}
-                    </select>
+                    <Text>What equipment do you want to use?</Text>
+                    <SelectList
+                        data = {["Doesn't Matter", "None", "Barbell", "Dumbells", "Machine", "Cable", "Kettlebell", "Resistance Band", "Resistance Band Assisted", "EZ Curl Barbell", "Trap Bar", "Smith Machine", "Body Weight", "Weighted", "Misc"]}
+                        setSelected = {val => query.current.equipment = (val == "Doesn't Matter" ? "" : val)}
+                        id = "equip"
+                    ></SelectList>
 
-                    <label>Please select the primary muscle groups you wish these exercises to work.
-                        {["Back","Chest","Shoulders","Arms","Legs","Core"].map((muscGr) => {
-                            return(
-                                <label><input type='checkbox' id = {muscGr} name = {muscGr} value = {muscGr} onClick={() => this.addFunc(this.state.query['primaryMuscleGroups'], muscGr.toLowerCase())}></input>{muscGr}</label>
-                            )
-                        })}
-                    </label>
+                    <Text>What primary muscle groups do you wish to exercise?</Text>
+                    <MultipleSelectList data = {["Back","Chest","Shoulders","Arms","Legs","Core"]}
+                                        setSelected={val => setSPMG(val)}
+                                        id = "pmg"
+                    ></MultipleSelectList>
 
-                    <br></br>
+                    <Text>{"\n"}</Text>
 
-                    <label>Please select the secondary muscle groups you wish these exercises to work.
-                        {["Back","Chest","Shoulders","Arms","Legs","Core"].map((sMuscGr) => {
-                            return(
-                                <label><input type='checkbox' id = {sMuscGr} name = {sMuscGr} value = {sMuscGr} onClick={() => this.addFunc(this.state.query['secondaryMuscleGroups'], sMuscGr.toLowerCase())}></input>{sMuscGr}</label>
-                            )
-                        })}
-                    </label>
+                    <Text>What secondary muscle groups do you wish to exercise?</Text>
+                    <View>
+                    <MultipleSelectList data = {["Back","Chest","Shoulders","Arms","Legs","Core"]}
+                                        setSelected = {val => setSSMG(val)}
+                                        id = "smg"
+                    ></MultipleSelectList>
+                    </View>
 
-                    <p>Choose what type of force you wish to use for this exercise.</p>
-                    {["Push", "Pull", "Push and Pull"].map((force, num) => {
-                        return(
-                            <div>
-                                <input onClick = {() => this.queryStringChange('force', force, num)} type = 'radio' value = {force} id = {force} name = 'force'></input>
-                                <label htmlFor = {force}>{force}</label>
-                            </div>
-                        )
-                    })}
+                    <Text>What force do you wish to use for this exercise?</Text>
+                    <SelectList
+                        data = {["Doesn't Matter", "Push", "Pull", "Push and Pull"]}
+                        setSelected = {val => query.current.force = (val == "Doesn't Matter" ? "" : val)}
+                        id = "force"
+                    ></SelectList>
                     
-                    <Button onClick = {() => {this.screenEst(3); this.secondaryDisplay = (this.state.query['secondaryMuscleGroups'].length == 0)}}>Next Page</Button>
-                </div>
+                    <Button title = "Next Page" onPress = {() => screenEst(3)} />
+                </SafeAreaView>
             )
         }
-        else if (this.state.screenState == 3){
+        else if (screenState == 3){
             return(
-                <div>
-                    <p>Please pick the primary muscles you wish these exercises to work.</p>
-                    {this.pmChecks.map((primMusc) => {
-                        return(
-                            <label><input onClick={() => this.addFunc(this.state.query['primaryMuscles'], primMusc.toLowerCase())} type='checkbox' id = {primMusc} name = 'primMusc' value = {primMusc}></input>{primMusc}</label>
-                        )
-                    })}
+                <SafeAreaView style = {{
+                    //source: https://reactnative.dev/docs/modal
+                    margin: 20,
+                    backgroundColor: 'white',
+                    borderRadius: 20,
+                    padding: 35,
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}>
+                    <Text>Please pick the primary muscles you wish these exercises to work.</Text>
+                    <MultipleSelectList data = {[{value: "Trapezius", disabled: !pmChecks.current.includes("Trapezius")}, {value: "Erector Spinae", disabled: !pmChecks.current.includes("Erector Spinae")}, {value: "Latissimus Dorsi", disabled: !pmChecks.current.includes("Latissimus Dorsi")},
+                                                {value: "Upper Chest", disabled: !pmChecks.current.includes("Upper Chest")}, {value: "Lower Chest", disabled: !pmChecks.current.includes("Lower Chest")}, {value: "Pectoralis Minor", disabled: !pmChecks.current.includes("Pectoralis Minor")},
+                                                {value: "Anterior Deltoid", disabled: !pmChecks.current.includes("Anterior Deltoid")}, {value: "Lateral Deltoid", disabled: !pmChecks.current.includes("Lateral Deltoid")}, {value: "Posterior Deltoid", disabled: !pmChecks.current.includes("Posterior Deltoid")},
+                                                {value: "Triceps", disabled: !pmChecks.current.includes("Triceps")}, {value: "Biceps", disabled: !pmChecks.current.includes("Biceps")}, {value: "Pronators", disabled: !pmChecks.current.includes("Pronators")}, {value: "Supinators", disabled: !pmChecks.current.includes("Supinators")}, {value: "Forearm Flexors", disabled: !pmChecks.current.includes("Forearm Flexors")}, {value: "Forearm Extensors", disabled: !pmChecks.current.includes("Forearm Extensors")}, {value: "Brachioradialis", disabled: !pmChecks.current.includes("Brachioradialis")},
+                                                {value: "Quadriceps", disabled: !pmChecks.current.includes("Quadriceps")}, {value: "Hamstrings", disabled: !pmChecks.current.includes("Hamstrings")}, {value: "Calves", disabled: !pmChecks.current.includes("Calves")}, {value: "Adductors", disabled: !pmChecks.current.includes("Adductors")}, {value: "Abductors", disabled: !pmChecks.current.includes("Abductors")}, {value: "Gluteal Muscles", disabled: !pmChecks.current.includes("Gluteal Muscles")},
+                                                {value: "Obliques", disabled: !pmChecks.current.includes("Obliques")}, {value: "Transverse Abdominis", disabled: !pmChecks.current.includes("Transverse Abdominis")}, {value: "Transverse Abdominis", disabled: !pmChecks.current.includes("Transverse Abdominis")}
+                                                ]}
+                                        setSelected = {val => setSPM(val)}
+                                        save = "value"
+                                        id = "pm"
+                    ></MultipleSelectList>
+                    
+                    <Text>Please pick the secondary muscles you wish these exercises to work.</Text>
+                    <MultipleSelectList data = {[{value: "Trapezius", disabled: !smChecks.current.includes("Trapezius")}, {value: "Erector Spinae", disabled: !smChecks.current.includes("Erector Spinae")}, {value: "Latissimus Dorsi", disabled: !smChecks.current.includes("Latissimus Dorsi")},
+                                                {value: "Upper Chest", disabled: !smChecks.current.includes("Upper Chest")}, {value: "Lower Chest", disabled: !smChecks.current.includes("Lower Chest")}, {value: "Pectoralis Minor", disabled: !smChecks.current.includes("Pectoralis Minor")},
+                                                {value: "Anterior Deltoid", disabled: !smChecks.current.includes("Anterior Deltoid")}, {value: "Lateral Deltoid", disabled: !smChecks.current.includes("Lateral Deltoid")}, {value: "Posterior Deltoid", disabled: !smChecks.current.includes("Posterior Deltoid")},
+                                                {value: "Triceps", disabled: !smChecks.current.includes("Triceps")}, {value: "Biceps", disabled: !smChecks.current.includes("Biceps")}, {value: "Pronators", disabled: !smChecks.current.includes("Pronators")}, {value: "Supinators", disabled: !smChecks.current.includes("Supinators")}, {value: "Forearm Flexors", disabled: !smChecks.current.includes("Forearm Flexors")}, {value: "Forearm Extensors", disabled: !smChecks.current.includes("Forearm Extensors")}, {value: "Brachioradialis", disabled: !smChecks.current.includes("Brachioradialis")},
+                                                {value: "Quadriceps", disabled: !smChecks.current.includes("Quadriceps")}, {value: "Hamstrings", disabled: !smChecks.current.includes("Hamstrings")}, {value: "Calves", disabled: !smChecks.current.includes("Calves")}, {value: "Adductors", disabled: !smChecks.current.includes("Adductors")}, {value: "Abductors", disabled: !smChecks.current.includes("Abductors")}, {value: "Gluteal Muscles", disabled: !smChecks.current.includes("Gluteal Muscles")},
+                                                {value: "Obliques", disabled: !smChecks.current.includes("Obliques")}, {value: "Transverse Abdominis", disabled: !smChecks.current.includes("Transverse Abdominis")}, {value: "Transverse Abdominis", disabled: !smChecks.current.includes("Transverse Abdominis")}
+                                                ]}
+                                        setSelected = {val => setSSM(val)}
+                                        save = "value"
+                                        id = "sm"
+                    ></MultipleSelectList>
 
-                    <div hidden = {this.secondaryDisplay}>
-                        <p>Please pick the secondary muscles you wish these exercises to work.</p>
-                        {this.smChecks.map((secMusc) => {
-                            return(
-                                <label><input onClick={() => this.addFunc(this.state.query['secondaryMuscles'], secMusc.toLowerCase())} type='checkbox' id = {secMusc} name = 'secMusc' value = {secMusc}></input>{secMusc}</label>
-                            )
-                        })}
-                    </div>
+                    <Text>{"\n"}</Text>
+                    
+                    <Text>Please select any tags you wish the exercises to follow:</Text>
+                    <MultipleSelectList data = {["Powerlifting", "Olympic", "Strongman", "Calisthenics", "Plyometric"]}
+                                        setSelected={val => {setST(val)}}
+                                        id = "tag"
+                    ></MultipleSelectList>
 
-                    <br></br>
+                    <Text>{"\n"}</Text>
+                    <Text>Please select the type of exercise you want to search for:</Text>
 
-                    <label>
-                        Please select any tags you wish the exercises to follow:
-                        <br></br>
-                        {["Powerlifting", "Olympic", "Strongman", "Calisthenics", "Plyometric"].map((tag) => {
-                            return(
-                                <label><input type = 'checkbox' onClick={() => this.addFunc(this.state.query['tags'], tag.toLowerCase())}></input>{tag}</label>
-                            )
-                        })}
-                    </label>
+                    <SelectList data = {["Doesn't Matter", "Compound", "Isolation"]}
+                                setSelected = {val => query.current.type = (val == "Doesn't Matter" ? "" : val)}
+                                id = 'type'
+                    ></SelectList>
 
-                    <br></br>
-                    <label>
-                        Please select the type of exercise you want to search for:
-                        <br></br>
-                        <label><input type = 'radio' name = 'type' onClick={() => this.queryStringChange('type', "compound", 0)} value = 'compound' id = 'compound'></input>Compound</label>                    
-                        <label><input type = 'radio' name = 'type' onClick={() => this.queryStringChange('type', "isolation", 1)} value = 'isolation' id = 'isolation'></input>Isolation</label>
-                    </label>
-                    <Button onClick={() => this.getExercises()}>Search for Exercises</Button>
-                </div>
+                    <Button title = "Search for Exercises" onPress={() => getExercises()} />
+                </SafeAreaView>
             )
         }
-        else if (this.state.screenState == 4){ {/*Results Page*/}
+        else if (screenState == 4){ {/*Results Page*/}
             return(
-                <SafeAreaView style = {{flex: 1, height: screen.height}}>
-                    <FlatList data = {this.queryResults} renderItem={({item: query}) => <ExerciseInfo hideCheck = {false} addToSelected = {() => this.addFunc(this.state.selectedExcs, query)} exerciseData = {query}/>}>
+                <SafeAreaView style = {{
+                    //source: https://reactnative.dev/docs/modal
+                    height: 500,
+                    margin: 20,
+                    backgroundColor: 'white',
+                    borderRadius: 20,
+                    padding: 35,
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}>
+                    <FlatList data = {queryResults.current} renderItem={({item: query}) => <ExerciseInfo hideCheck = {false} addToSelected = {() => setSelectedExcs(addFunc(selectedExcs, query))} exerciseData = {query}/>}>
                     </FlatList>
-                    <Button onClick = {() => this.addToWorkData(this.state.selectedExcs)}>Add Selected Exercise(s) to Workout</Button>
+                    <Button title = "Add Selected Exercise(s) to Workout" onPress = {() => {addToWorkData(selectedExcs); setShow(false)}} />
                 </SafeAreaView>
             )
         }
     }
-}
-
-export default WorkoutModalComp

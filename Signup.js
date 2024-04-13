@@ -1,23 +1,24 @@
 //use of route source: https://www.youtube.com/watch?v=GkH_VeAeur8
 
 import { React, Component} from 'react';
+import { Button, Text, TextInput, SafeAreaView } from 'react-native';
 
 export default function Signup({navigation, route}){
 
-    const signUpUser = async (username, fName, lName, email, pass) => {       
-        const body = {
-            username: username,
-            firstname: fName,
-            lastname: lName,
-            email: email,
-            password: pass
-        }
-    
-        let response = await fetch('http://localhost:3001/createUser', {
+    const creationBody = {
+        username: "",
+        firstname: "",
+        lastname: "",
+        email: "",
+        password: ""
+    }
+
+    const signUpUser = async () => {       
+        let response = await fetch('http://localhost:3001/users/createUser', {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type':'application/json'},
-            body: JSON.stringify(body)
+            body: JSON.stringify(creationBody)
         }).then(function(resp){
             return resp.json()
         })
@@ -25,22 +26,23 @@ export default function Signup({navigation, route}){
     }
 
     return(
-        <div>
-            <label id = 'fnameL'>First Name: </label>
-            <input type = 'text' id = 'fName' className = 'signup'></input>
-            <br />
-            <label id = 'lnameL'>Last Name: </label>
-            <input type = 'text' id = 'lName' className = 'signup'></input>
-            <br />
-            <label id = 'emailL'>Email: </label>
-            <input type = 'text' id = 'emailI' className = 'signup'></input>
-            <br />
-            <label id = 'unameL'>Username: </label>
-            <input type = 'text' id = 'uName' className = 'signup'></input>
-            <br />
-            <label id = 'pwL'>Password: </label>
-            <input type = 'text' id = 'pw' className = 'signup'></input>
-            <button onClick = {() => signUpUser(document.getElementById('uName').value, document.getElementById('fName').value, document.getElementById('lName').value, document.getElementById('emailI').value, document.getElementById('pw').value)}>Sign Up</button>
-        </div>
+        <SafeAreaView>
+            <Text id = 'fnameL'>First Name: </Text>
+            <TextInput onChangeText={text => creationBody.firstname = text} id = 'fName'></TextInput>
+
+            <Text id = 'lnameL'>Last Name: </Text>
+            <TextInput onChangeText={text => creationBody.lastname = text} id = 'lName'></TextInput>
+
+            <Text id = 'emailL'>Email: </Text>
+            <TextInput onChangeText={text => creationBody.email = text} id = 'emailI'></TextInput>
+
+            <Text id = 'unameL'>Username: </Text>
+            <TextInput onChangeText={text => creationBody.username = text} id = 'uName'></TextInput>
+
+            <Text id = 'pwL'>Password: </Text>
+            <TextInput onChangeText={text => creationBody.password = text} id = 'pw'></TextInput>
+
+            <Button title = "Sign Up" onPress = {() => signUpUser()} />
+        </SafeAreaView>
     )
 }

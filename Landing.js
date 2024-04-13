@@ -1,64 +1,31 @@
 import { React, Component} from 'react';
-import './css/Landing.css'
-import { StyleSheet } from 'react-native';
-import logo from './assets/ex365.png'
+//import './css/Landing.css'
+import { Dimensions, Modal, StyleSheet, Text, SafeAreaView, View, Image, TextInput, Button, Switch } from 'react-native';
+import WorkoutModalComp from './WorkoutModalComp';
 
 class LandingComp extends Component{
     constructor(props){
         super(props)
         this.navigation = props.navigation
         this.state = {
-            error: "hidden"
+            error: "hidden",
+            modalVis: false
         };
-
-        /** TODO: NEED TO COMPLETE STYLING SWITCH
-        const style = StyleSheet.create({
-            logo: {
-                display: 'block',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                transform: scale(.3),
-                outline: '1px solid black'
-            },
-            
-            input: {
-                margin: 'auto',
-                width: 50,
-                padding: 10,
-                display: block
-            },
-            
-            passInfo: {
-                marginTop: 100
-            },
-            
-            button: {
-                backgroundColor: '#219ebc',
-                border: 'none',
-                borderRadius: 2,
-                color: 'white',
-                padding: 30,
-                textAlign: 'center',
-                textDecoration: 'none',
-                display: 'block',
-                fontSize: 16,
-                marginTop: 100
-            }
-        })
-        */
+        this.inputBody = {
+            login1: "", 
+            password: ""
+        }
+        this.test = ""
+        /* TODO: NEED TO COMPLETE STYLING SWITCH */
     }
 
-    signUpOnClick(email){
-        this.navigation.navigate("Signup", {email: email}) //source: https://www.youtube.com/watch?v=-40TBdSRk6E
+    signUpOnClick(){
+        this.navigation.navigate("Signup", {email: this.inputBody.login1}) //source: https://www.youtube.com/watch?v=-40TBdSRk6E
     }
     
-    loginOnClick(email, pw){
+    loginOnClick(){
         //check if this email and pass are correct (could combine signUp and login onclicks when refactoring)
-            if(email == 'ed@gmail.com' && pw == '123'){
-                if(this.state.error == "visible"){
-                    this.setState({error: "hidden"})
-                }
-                this.navigation.navigate('Home', {workouts:
+            this.navigation.navigate('WorkoutHome', {workouts:
                     [ //test data, will be replaced with database data in the future
                         {
                             workoutName: 'Chest Day',
@@ -93,83 +60,50 @@ class LandingComp extends Component{
                             ]
                         }
                     ]})
-            }
-            else{
-                this.setState({error: "visible"})
-            }
 
     }
 
-    async makeUser(){
-        const body = {
-            name: "dad"
-        }
-
-        let response = await fetch('http://localhost:3001/createUser', {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type':'application/json'},
-            body: JSON.stringify(body)
-        }).then(function(resp){
-            return resp.json()
-        })
-        console.log(response)
-    }
-
-    async getUser(){
-        let response = await fetch('http://localhost:3001/getUsers', {
-            method: 'GET',
-            mode: 'cors',
-            headers: { 'Content-Type':'application/json',
-            'Access-Control-Allow-Origin':'*',
-            'Access-Control-Allow-Methods':'GET,POST,PATCH,OPTIONS'}
-        }).then(function(response){
-            return response.json()
-        })
-
-        console.log(response)
-    }
-
-    async signIn(login1, pass){
-        const body = {
-            login1: login1,
-            password: pass
-        }
+    async login(){
+        console.log(this.inputBody)
     
-        let response = await fetch('http://localhost:3001/signIn', {
+        let response = await fetch('http://localhost:3001/users/signIn', {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type':'application/json'},
-            body: JSON.stringify(body)
+            body: JSON.stringify(this.inputBody)
         }).then(function(resp){
             return resp.json()
+        }).catch(err => {
+            console.log(err)
+            return
         })
         console.log(response)
 
+        this.navigation.navigate('Home', {userData: response})
     }
 
     render(){
         return(
-            <div>
-                <img id = 'logo' src = {logo}></img>
-                <center id = 'input'>
-                    <label htmlFor = "email">Email/Username: </label>
-                    <input type = "text" id = "email" className = "fields" name = "email"></input>
-
-                    <div id = 'passInfo'>
-                        <label htmlFor = "pass">Password: </label>
-
-                        <input type = "text" id = "pass" className = "fields" name = "pass"></input>
-                    </div>
-                    <br></br>
-                    <button type = "button" class = 'button' onClick={() => this.signUpOnClick(document.getElementById('email').value)}>Sign Up</button>
-                    <button testID = 'loginTest' type = "button" class = 'button' onClick={() => this.loginOnClick(document.getElementById('email').value, document.getElementById('pass').value)}>Login (NOT SERVER)</button>
-                    <button testID = 'loginTest' type = "button" class = 'button' onClick={() => this.signIn(document.getElementById('email').value, document.getElementById('pass').value)}>Login</button>
-                    <button onClick = {() => this.getUser()}>Test Server</button>
-                    <button onClick = {() => this.makeUser()}>Test Post</button>
-                    <p testID = 'error' style={{visibility: this.state.error}}>Error: Please enter a valid account</p>
-                </center>
-            </div>
+            <SafeAreaView>
+                <Image style = {{width: 200, height: 200}} id = 'logo' source = {require('./assets/ex365.png')}></Image>
+                <View>
+                    <Text>Email/Username: </Text>
+                    <TextInput id = "email" onChangeText={text => this.inputBody.login1 = text}></TextInput>
+                </View>
+                <View id = 'passInfo'>
+                    <Text>Password: </Text>
+                    <TextInput onChangeText={text => this.inputBody.password = text} id = "pass"></TextInput>
+                </View>
+                <Button title = "Sign Up" onPress={() => this.signUpOnClick()} />
+                <Text>{"\n"}</Text>
+                <Button title = "Login" onPress={() => this.login()} />
+                <Button title = "To Next Page (FOR EZ TEST)" onPress = {() => this.loginOnClick()}></Button>
+                <Button title = "Dimensions Test" onPress = {() => console.log(Dimensions.get('screen'))} />
+                <Text>Error: Please enter a valid account</Text>
+                <Modal transparent = {true} visible = {this.state.modalVis}>
+                    <WorkoutModalComp></WorkoutModalComp>
+                </Modal>
+            </SafeAreaView>
         )
     }
 }

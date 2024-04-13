@@ -1,22 +1,26 @@
-import { React, Component, useState, useEffect, useRef} from 'react';
-import './css/WorkoutGen.css'
-import { Modal, Button } from 'react-bootstrap'; //change these to react native versions
-import { FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, Alert } from 'react-native';
+import { React, useState, useEffect, useRef} from 'react';
+//import './css/WorkoutGen.css'
+//import { Modal } from 'react-bootstrap'; //change these to react native versions
+import { Modal, Dimensions, FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, TextInput, Text, TouchableOpacity, TouchableWithoutFeedback, View, Alert, Button } from 'react-native';
 import WorkoutModalComp from './WorkoutModalComp';
 import ExerciseInfo from './ExerciseInfo';
 
 //TODO: Need to create functionality to support editing preexisting workouts (can be done with checking if a newly introduced prop that holds already existing workout data is null)
 //TODO: NEED TO FIX USESTATES FOR REMOVEMODE TO ALLOW FOR CHECKBOX AND TRASH BUTTON HIDE/APPEAR BASED ON REMOVEMODE AFTER PRESSING DELETE EXERCISES BUTTON
 
-const WGC = props => {
-    const navigation = props.navigation
-    const route = props.route
+export default function WorkoutGenerat({navigation, route}){
+    let workoutName = useRef("")
+    let workoutDesc = useRef("")
     const [newWorkData, setNewWorkData] = useState([]) //holds all data for new workout
     const [show, setShow] = useState(false) //variable that decides whether modal is shown
     const [removeMode, setRM] = useState(true) //variable that decides whether user can remove exercises from workout
-    let workoutData = route.params.workoutData //all workout data of user
+    let workoutData = route.params.userData.workouts //all workout data of user
     let deleteExcs = useRef([]) //useRef needs to be used or rerender would be messed up after first rerender
     let muscleGroups = [] //array that holds tags of musles that are used (MAY NOT BE USED)
+
+    useEffect(() => {
+        setNewWorkData(newWorkData)
+    })
 
     const addGroup = (mutArray, arrayAdd) => {
         /**
@@ -26,25 +30,29 @@ const WGC = props => {
          * @param {any} arrayAdd: item to be removed from or added to mutArray
          */
         
-        if(mutArray.includes(arrayAdd)){
-            mutArray.splice(mutArray.indexOf(arrayAdd), 1)
+        let tmp = mutArray
+
+        if(tmp.includes(arrayAdd)){
+            tmp.splice(tmp.indexOf(arrayAdd), 1)
         }
         else{
-            mutArray.splice(mutArray.length, 0, arrayAdd)
+            tmp.splice(tmp.length, 0, arrayAdd)
         }
 
-        console.log('',mutArray)
+        return tmp
     }
 
     const removeExercises = () => {
         /**
          * Remove exercises from newWorkData that match exercises in deleteExercises array (removes them from potentially added exercises array and un-renders them)
          */
+
         setNewWorkData(prevWorkData => {
             // Filter out the exercises that need to be removed
             const tmp = prevWorkData.filter(
                 (exc) => {
-                    return !deleteExcs.current.includes(exc.id);
+                    console.log(exc)
+                    return !deleteExcs.current.includes(exc.exerciseItem.id);
                 }
             );
 
@@ -63,13 +71,12 @@ const WGC = props => {
         setNewWorkData(prevWorkData => {
             //console.log("PREVWORKDATA: ", prevWorkData);
             let temp = [...prevWorkData]; //get prev data
-
             
             //MAPPING BETTER FOR TRANSFORMING, FOR EACH BETTER FOR MUTATING
             excArray.forEach(excData => { //for each item of exercise data
-                if(!temp.some(data => data.id === excData.id)){ //if data is not already in workoutGenerat exc list
+                if(!temp.some(data => data.exerciseItem.id === excData.id)){ //if data is not already in workoutGenerat exc list
                     //console.log(excData)
-                    temp.push(excData) //add to list
+                    temp.push({exerciseItem: excData, sets: 0, reps: 0}) //add to list
                     //console.log('temp is now '+ temp)
                 }
             });
@@ -78,38 +85,74 @@ const WGC = props => {
         })
     }
 
+    const saveWorkout = async () => {
+        //TODO: need to save workouts
+        const sendData = {
+            username: route.params.userData.username,
+            workoutName: workoutName.current,
+            workoutDesc: workoutDesc.current,
+            exercises: newWorkData
+        }
+
+        console.log(JSON.stringify(sendData))
+
+        let response = await fetch('http://localhost:3001/workouts/createWorkout', {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type':'application/json'},
+            body: JSON.stringify(sendData)
+        }).then(function(resp){
+            return resp.json()
+        })
+        console.log(response)
+
+        workoutData = [...workoutData, {workoutName: workoutName.current, workoutDesc: workoutDesc.current, exercises: newWorkData}]
+
+        navigation.navigate("Home", {userData: {username: route.params.userData.username, workouts: workoutData}})
+
+    }
+
     return(
-        <div>
-            <label htmlFor = 'workName'>Workout Name: </label>
-                <input id = 'workName' name = 'workName'></input>
-                <br />
-            <label htmlFor = 'workDesc'>Workout Description: </label>
-                <input id = 'workDesc' name = 'workDesc'></input>
+        <SafeAreaView>
+            <View>
+                <Text>Workout Name: </Text>
+                <TextInput onChangeText = {text => workoutName.current = text} id = 'workName'></TextInput>
+            </View>
+            <View>
+                <Text>Workout Description: </Text>
+                <TextInput onChangeText = {text => workoutDesc.current = text} id = 'workDesc'></TextInput>
+            </View>
+            <Text>{"\n"}</Text>
+            <Button title = "Add" onPress = {() => setShow(true)} />
+            <Button title = "Delete Exercises" onPress = {() => setRM(true)} />
+            <Button title = "Trash Icon Here" onPress = {() => removeExercises()} />
+            <Button title = "Save Workout" onPress = {() => saveWorkout()} />
 
-            <br />
-            <button onClick = {() => setShow(true)}>Add</button>
-            <button onClick = {() => setRM(true)}>Delete Exercises</button>
-            <button onClick = {() => removeExercises()}>Trash Icon Here</button>
-            <button onClick = {() => navigation.navigate('Home', {workouts: [...workoutData, {workoutName: document.getElementById('workName').value, workoutDesc: document.getElementById('workDesc').value, exercises: newWorkData}]})}>Save Workout</button>
-
-            <br />
-            <SafeAreaView style = {{flex: 1, height: screen.height}}>
-                <FlatList data = {newWorkData} renderItem={({item}) => <ExerciseInfo hideCheck = {!removeMode} addToSelected = {() => {console.log('setting deleteExcs to: '); addGroup(deleteExcs.current, item.id); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item}/>}>
-                </FlatList>
-            </SafeAreaView>
-            <br />
-
-            <Modal propagateSwipe id = 'modal' style = {{width: '50%'}} show = {show} onHide = {() => setShow(false)}>
-                <Modal.Body>
-                    <WorkoutModalComp addToWorkData = {addToWorkData} addFunc = {addGroup} compMuscGroups = {muscleGroups}/>
-                </Modal.Body>
+            <Text>{"\n"}</Text>
+            <View style = {{
+                //source: https://reactnative.dev/docs/modal
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center'}}>
+            <Modal transparent = {true} visible = {show}>
+                <WorkoutModalComp addToWorkData = {addToWorkData} addFunc = {addGroup} setShow = {setShow}></WorkoutModalComp>
             </Modal>
-        </div>
-    )
-}
-
-export default function WorkoutGenerat({navigation, route}){
-    return(
-        <WGC navigation = {navigation} route = {route}></WGC>
+            </View>
+            <View style = {{flex: 1, height: "auto"}}>
+                <FlatList data = {newWorkData} renderItem={({item: item, index: number}) => 
+                    <View>
+                        <ExerciseInfo hideCheck = {!removeMode} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.exerciseItem.id); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>
+                        <View style = {{flexDirection: 'row'}}>
+                            <Text>Sets: </Text>
+                            <TextInput placeholder = {newWorkData[number].sets} onChange = {text => setNewWorkData(prevWorkData => {let tmp = [...prevWorkData]; tmp[number].sets = text; return tmp;})} keyboardType='number-pad'></TextInput>
+                        </View>
+                        <View style = {{flexDirection: 'row'}}>
+                            <Text>Reps: </Text>
+                            <TextInput placeholder = {newWorkData[number].reps} onChange = {text => setNewWorkData(prevWorkData => {let tmp = [...prevWorkData]; tmp[number].reps = text; return tmp;})} keyboardType='number-pad'></TextInput>
+                        </View>
+                    </View>}>
+                </FlatList>
+            </View>
+        </SafeAreaView>
     )
 }
