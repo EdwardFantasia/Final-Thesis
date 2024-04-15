@@ -19,7 +19,7 @@ export default function Home({navigation, route}){
 
     return(
         <SafeAreaView>
-            <Text>Insert PFP</Text>
+            <Image style = {{width: 150, height: 150}} source = {{ uri: data.picture }} />
             <Text>{data.username}</Text>
             <View style = {{flexDirection: 'row'}}>
                 <Text>Workouts  </Text>
@@ -27,7 +27,7 @@ export default function Home({navigation, route}){
                 <Text>  Recipe Book</Text>
                 {data["workouts"].map(workout => {
                     return(
-                        <Button onPress = {() => {console.log(workout)}}></Button>
+                        <Button title = "hi" onPress = {() => {console.log(workout)}}></Button>
                     )
                 })}
             </View>

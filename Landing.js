@@ -66,7 +66,7 @@ class LandingComp extends Component{
     async login(){
         console.log(this.inputBody)
     
-        let response = await fetch('http://localhost:3001/users/signIn', {
+        let response = await fetch('http://10.0.2.2:3443/users/signIn', {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type':'application/json'},

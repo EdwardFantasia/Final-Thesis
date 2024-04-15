@@ -13,6 +13,17 @@ router.get("/getUser/:username", (req, res) => {
     })
 })
 
+router.post("/createPic", async (req, res) => {
+    const user = await userModel.findOne({username: req.body})
+    if (user){
+        console.log()
+        user.picture = req.body.picUrl
+        await user.save()
+        return res.json({picUrl: req.body.picUrl})
+    }
+    return res.json({success: false})
+})
+
 router.post("/signIn", async (req, res) => {
     //TODO: try to remove for loop
     console.log("body: ", req.body)
