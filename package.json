@@ -19,6 +19,7 @@
     "@eliav2/react-native-collapsible-view": "^1.5.1",
     "@expo/webpack-config": "^19.0.0",
     "@fontsource/dm-sans": "^5.0.18",
+    "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/drawer": "^6.6.6",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",

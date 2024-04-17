@@ -13,15 +13,16 @@ router.get("/getUser/:username", (req, res) => {
     })
 })
 
-router.post("/createPic", async (req, res) => {
-    const user = await userModel.findOne({username: req.body})
-    if (user){
-        console.log()
-        user.picture = req.body.picUrl
-        await user.save()
-        return res.json({picUrl: req.body.picUrl})
-    }
-    return res.json({success: false})
+router.patch("/setPic", async (req, res) => {
+    console.log(req.body.username)
+    var patchUser = await userModel.findOne({username: req.body.username})
+    console.log(patchUser)
+    console.log(req.body.picUrl)
+    console.log(typeof req.body.picUrl)
+    patchUser.picture = req.body.picUrl
+    await patchUser.save()
+    console.log(patchUser.picture)
+    res.json({success: true})
 })
 
 router.post("/signIn", async (req, res) => {
@@ -54,6 +55,7 @@ router.post("/createUser", async (req, res) => {
     userModel.create(req.body)
     .then(async (result, err) => {
         if(!err){
+            console.log("result: " + result)
             res.json(result)
         }
         else{

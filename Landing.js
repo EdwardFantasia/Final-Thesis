@@ -85,7 +85,7 @@ class LandingComp extends Component{
     render(){
         return(
             <SafeAreaView>
-                <Image style = {{width: 200, height: 200}} id = 'logo' source = {require('./assets/ex365.png')}></Image>
+                <Image style = {{width: 200, height: 200}} id = 'logo' source = {require('./assets/exc365.png')}></Image>
                 <View>
                     <Text>Email/Username: </Text>
                     <TextInput id = "email" onChangeText={text => this.inputBody.login1 = text}></TextInput>
