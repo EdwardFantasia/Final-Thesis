@@ -20,47 +20,7 @@ class LandingComp extends Component{
     }
 
     signUpOnClick(){
-        this.navigation.navigate("Signup", {email: this.inputBody.login1}) //source: https://www.youtube.com/watch?v=-40TBdSRk6E
-    }
-    
-    loginOnClick(){
-        //check if this email and pass are correct (could combine signUp and login onclicks when refactoring)
-            this.navigation.navigate('WorkoutHome', {workouts:
-                    [ //test data, will be replaced with database data in the future
-                        {
-                            workoutName: 'Chest Day',
-                            workoutDesc: 'This chest day focuses primarily on chest, with a bit of tricep work',
-                            exercises: [
-                                {
-                                    equipment: 'dumbells',
-                                    force: 'push',
-                                    id: '0a01',
-                                    instructions: 'Perform the dumbbell bench press exercise by lying flat on your back on a bench and push dumbbells up and retract',
-                                    name: 'DB Bench',
-                                    primaryMuscleGroups: ['chest'],
-                                    primaryMuscles: ['upper chest'],
-                                    secondaryMuscleGroups: ['shoulders'],
-                                    secondaryMuscles: ['shoulder muscles'],
-                                    tags: ['powerlifting'],
-                                    type: 'compound'
-                                },
-                                {
-                                    equipment: 'idk',
-                                    force: 'pull',
-                                    id: '0a02',
-                                    instructions: 'Perform the barbell squat exercise by putting barbell on back and performing a sitting motion then standing when legs are around 90 degree angle',
-                                    name: 'Barbell Squat',
-                                    primaryMuscleGroups: ['legs'],
-                                    primaryMuscles: ['quadriceps'],
-                                    secondaryMuscleGroups: ['shoulders'],
-                                    secondaryMuscles: ['shoulder muscles'],
-                                    tags: ['powerlifting'],
-                                    type: 'compound'
-                                }
-                            ]
-                        }
-                    ]})
-
+        this.navigation.navigate("Signup") //source: https://www.youtube.com/watch?v=-40TBdSRk6E
     }
 
     async login(){
@@ -85,24 +45,21 @@ class LandingComp extends Component{
     render(){
         return(
             <SafeAreaView>
-                <Image style = {{width: 200, height: 200}} id = 'logo' source = {require('./assets/exc365.png')}></Image>
-                <View>
-                    <Text>Email/Username: </Text>
-                    <TextInput id = "email" onChangeText={text => this.inputBody.login1 = text}></TextInput>
+                <View style = {{alignItems: "center"}}>
+                    <Image style = {{width: 200, height: 200}} id = 'logo' source = {require('./assets/exc365Logo.png')}></Image>
+                        <Text />
+                    <Text>Email/Username</Text>
+                    <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => this.inputBody.login1 = text}></TextInput>
+                        <Text />
+                    <Text>Password</Text>
+                    <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => this.inputBody.password = text} id = "pass"></TextInput>
+                    </View>
+                    <Text />
+                <View style = {{flexDirection: "row", justifyContent: "center"}}>
+                    <Button title = "Sign Up" onPress={() => this.signUpOnClick()} />
+                    <View style = {{width: 30}}></View>
+                    <Button title = "Login" onPress={() => this.login()} />
                 </View>
-                <View id = 'passInfo'>
-                    <Text>Password: </Text>
-                    <TextInput onChangeText={text => this.inputBody.password = text} id = "pass"></TextInput>
-                </View>
-                <Button title = "Sign Up" onPress={() => this.signUpOnClick()} />
-                <Text>{"\n"}</Text>
-                <Button title = "Login" onPress={() => this.login()} />
-                <Button title = "To Next Page (FOR EZ TEST)" onPress = {() => this.loginOnClick()}></Button>
-                <Button title = "Dimensions Test" onPress = {() => console.log(Dimensions.get('screen'))} />
-                <Text>Error: Please enter a valid account</Text>
-                <Modal transparent = {true} visible = {this.state.modalVis}>
-                    <WorkoutModalComp></WorkoutModalComp>
-                </Modal>
             </SafeAreaView>
         )
     }

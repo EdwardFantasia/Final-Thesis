@@ -13,7 +13,6 @@ import { StyleSheet } from 'react-native';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
-  const NavBar = createNativeStackNavigator()
 
   return (
     <NavigationContainer>

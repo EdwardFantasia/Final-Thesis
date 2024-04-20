@@ -9,7 +9,6 @@ import {SelectList, MultipleSelectList} from 'react-native-dropdown-select-list'
 /*API: https://rapidapi.com/brianliong1999-aAas5mGoYZv/api/advanced-exercise-finder */
 
 //TODO: need to add in some randomization element (just add in a radio button that would allow for randomization, ask for level of randomization (low, med, high), then save that into account exercise data)
-//TODO: create tag creation system where there is a dictionary of all exercises (ok to not implement and just use a profile search)
 //TODO: Add X to top of Modal (change Modal return to just return a state variable and just change state variable with X at top to close)
 //TODO: need to reset modal after request
 //TODO: need to create error for when primaryMuscleGroup is empty

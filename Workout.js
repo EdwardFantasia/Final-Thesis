@@ -7,14 +7,9 @@ export default function Workout({navigation, route, workout}){
     const exercises = workout.exercises
 
     return(
-        <View id = 'workout'>
+        <Pressable style = {{borderWidth: 1, borderRadius: 10}}>
             <Text>{workout.workoutName}</Text>
             <Text>{workout.workoutDesc}</Text>
-            {exercises.map(excData => {
-                return(
-                    <ExerciseInfo exerciseData = {excData} addToSelected = {null} hidden = {'hidden'}></ExerciseInfo>
-                )
-            })}
-        </View>
+        </Pressable>
     )
 }

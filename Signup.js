@@ -5,6 +5,7 @@ import { Image, Button, Text, TextInput, SafeAreaView } from 'react-native';
 import { firebaseStorage } from './firebaseConfig'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from 'expo-image-manipulator'
 
 export default function Signup({navigation, route}){
 
@@ -27,7 +28,14 @@ export default function Signup({navigation, route}){
 
         if(!result.canceled){
             //TODO: set alert catch for if image is above (determined pixel size)
-            setPfp(await result.uri)
+            let resultType = result.uri.split(".").pop()
+            const setImageSize = await ImageManipulator.manipulateAsync(
+                result.uri,
+                [{resize: {width: 165, height: 165}}],
+                {compress: 1, format: resultType == "jpeg" ? ImageManipulator.SaveFormat.JPEG : ImageManipulator.SaveFormat.PNG}
+            )
+
+            setPfp(setImageSize.uri)
         }
     }
 
@@ -82,24 +90,28 @@ export default function Signup({navigation, route}){
     }
 
     return(
-        <SafeAreaView>
-            <Image style = {{width: 150, height: 150}} source = {{ uri: pfp }}></Image>
+        <SafeAreaView style = {{alignItems: "center"}}>
+            <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: pfp }}></Image>
+            <Text />
             <Button title = "Choose Profile Picture" onPress = {() => pfpSelect()}></Button>
+            <Text />
 
-            <Text id = 'fnameL'>First Name: </Text>
-            <TextInput onChangeText={text => creationBody.current.firstname = text} id = 'fName'></TextInput>
+            <Text id = 'fnameL'>First Name</Text>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.firstname = text} id = 'fName'></TextInput>
 
-            <Text id = 'lnameL'>Last Name: </Text>
-            <TextInput onChangeText={text => creationBody.current.lastname = text} id = 'lName'></TextInput>
+            <Text id = 'lnameL'>Last Name</Text>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.lastname = text} id = 'lName'></TextInput>
 
-            <Text id = 'emailL'>Email: </Text>
-            <TextInput onChangeText={text => creationBody.current.email = text} id = 'emailI'></TextInput>
+            <Text id = 'emailL'>Email</Text>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.email = text} id = 'emailI'></TextInput>
 
-            <Text id = 'unameL'>Username: </Text>
-            <TextInput onChangeText={text => creationBody.current.username = text} id = 'uName'></TextInput>
+            <Text id = 'unameL'>Username</Text>
+            <TextInput maxLength = {25} style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.username = text} id = 'uName'></TextInput>
+            
+            <Text id = 'pwL'>Password</Text>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.password = text} id = 'pw'></TextInput>
 
-            <Text id = 'pwL'>Password: </Text>
-            <TextInput onChangeText={text => creationBody.current.password = text} id = 'pw'></TextInput>
+            <Text />
 
             <Button title = "Sign Up" onPress = {() => signUpUser()} />
         </SafeAreaView>

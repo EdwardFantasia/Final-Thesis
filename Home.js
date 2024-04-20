@@ -4,6 +4,7 @@ import Workout from './Workout';
 import { SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button} from 'react-native';
 import ExerciseInfo from './ExerciseInfo';
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
+import AppNav from "./AppNav.js"
 
 export default function Home({navigation, route}){
     const [dataBool, setDataBool] = useState('workouts')
@@ -19,20 +20,22 @@ export default function Home({navigation, route}){
 
     return(
         <SafeAreaView>
-            <Image style = {{width: 150, height: 150}} source = {{ uri: data.picture }} />
-            <Text>{data.username}</Text>
-            <View style = {{flexDirection: 'row'}}>
-                <Text>Workouts  </Text>
-                    <Switch trackColor={'#f4f3f4'} thumbColor={'#2196F3'} value = {dataBool} onValueChange={() => {setDataBool(dataBool == 'workouts' ? 'meals':'workouts')}}/>
-                <Text>  Recipe Book</Text>
-                {data["workouts"].map(workout => {
-                    return(
-                        <Button title = "hi" onPress = {() => {console.log(workout)}}></Button>
-                    )
-                })}
-            </View>
-
+            <View style = {{alignItems: "center"}}>
+                <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: data.picture }} />
+                <Text>{data.username}</Text>
+                <View style = {{flexDirection: 'row'}}>
+                    <Text>Workouts  </Text>
+                        <Switch trackColor={'#f4f3f4'} thumbColor={'#2196F3'} value = {dataBool} onValueChange={() => {setDataBool(dataBool == 'workouts' ? 'meals':'workouts')}}/>
+                    <Text>  Recipe Book</Text>
+                    {data["workouts"].map(workout => {
+                        return(
+                            <Button title = "hi" onPress = {() => {console.log(workout)}}></Button>
+                        )
+                    })}
+                </View>
             <Button title = "Add Workouts" onPress = {() => {navigation.navigate("WorkoutGen", {userData: data})}}></Button>
+            </View>
+            <AppNav />
         </SafeAreaView>
     )
 

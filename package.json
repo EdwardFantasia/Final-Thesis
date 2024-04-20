@@ -24,6 +24,7 @@
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "expo": "~49.0.15",
+    "expo-image-manipulator": "^11.8.0",
     "expo-image-picker": "~14.3.2",
     "expo-status-bar": "~1.6.0",
     "express": "^4.19.2",
