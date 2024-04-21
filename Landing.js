@@ -15,8 +15,6 @@ class LandingComp extends Component{
             login1: "", 
             password: ""
         }
-        this.test = ""
-        /* TODO: NEED TO COMPLETE STYLING SWITCH */
     }
 
     signUpOnClick(){
@@ -24,18 +22,15 @@ class LandingComp extends Component{
     }
 
     async login(){
-        console.log(this.inputBody)
+        console.log("inputBody" + this.inputBody)
     
         let response = await fetch('http://10.0.2.2:3443/users/signIn', {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type':'application/json'},
-            body: JSON.stringify(this.inputBody)
+            body: JSON.stringify({login1: this.inputBody.login1, password: this.inputBody.password})
         }).then(function(resp){
             return resp.json()
-        }).catch(err => {
-            console.log(err)
-            return
         })
         console.log(response)
 
@@ -49,10 +44,10 @@ class LandingComp extends Component{
                     <Image style = {{width: 200, height: 200}} id = 'logo' source = {require('./assets/exc365Logo.png')}></Image>
                         <Text />
                     <Text>Email/Username</Text>
-                    <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => this.inputBody.login1 = text}></TextInput>
+                    <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => this.inputBody.login1 = text}></TextInput>
                         <Text />
                     <Text>Password</Text>
-                    <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => this.inputBody.password = text} id = "pass"></TextInput>
+                    <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => this.inputBody.password = text} id = "pass"></TextInput>
                     </View>
                     <Text />
                 <View style = {{flexDirection: "row", justifyContent: "center"}}>

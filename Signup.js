@@ -27,7 +27,6 @@ export default function Signup({navigation, route}){
         })
 
         if(!result.canceled){
-            //TODO: set alert catch for if image is above (determined pixel size)
             let resultType = result.uri.split(".").pop()
             const setImageSize = await ImageManipulator.manipulateAsync(
                 result.uri,
@@ -72,18 +71,12 @@ export default function Signup({navigation, route}){
                 headers: { 'Content-Type':'application/json'},
                 body: JSON.stringify({username: creationBody.current.username, picUrl: url})
             }).then(urlResp => {
-                console.log(JSON.stringify(urlResp))
                 if(urlResp.status === 200){
-                    console.log('worked')
                     return url
                 }
-                console.log('setting to blank')
                 return "https://firebasestorage.googleapis.com/v0/b/exercise365-5b879.appspot.com/o/blankpfp.png?alt=media&token=7f4c7abd-adae-4363-ba3d-cbbf76c81de3"
             })
             return tempResp
-        })
-        .catch(err => {
-            console.log(err)
         })
 
         navigation.navigate('Home', {userData: response})
@@ -97,19 +90,19 @@ export default function Signup({navigation, route}){
             <Text />
 
             <Text id = 'fnameL'>First Name</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.firstname = text} id = 'fName'></TextInput>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.firstname = text} id = 'fName'></TextInput>
 
             <Text id = 'lnameL'>Last Name</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.lastname = text} id = 'lName'></TextInput>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.lastname = text} id = 'lName'></TextInput>
 
             <Text id = 'emailL'>Email</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.email = text} id = 'emailI'></TextInput>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.email = text} id = 'emailI'></TextInput>
 
             <Text id = 'unameL'>Username</Text>
-            <TextInput maxLength = {25} style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.username = text} id = 'uName'></TextInput>
+            <TextInput maxLength = {25} style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.username = text} id = 'uName'></TextInput>
             
             <Text id = 'pwL'>Password</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onEndEditing={text => creationBody.current.password = text} id = 'pw'></TextInput>
+            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.password = text} id = 'pw'></TextInput>
 
             <Text />
 

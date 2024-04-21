@@ -46,7 +46,7 @@ router.post("/signIn", async (req, res) => {
             temp.push({workoutName: workoutObj.workoutName, workoutDesc: workoutObj.workoutDesc, exercises: tmpExcArr})
         }
         console.log("responding with: ", temp)
-        res.json({username: user.username, workouts: temp})
+        res.json({username: user.username, picture: user.picture, workouts: temp})
     }
 })
 

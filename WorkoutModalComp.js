@@ -2,7 +2,7 @@ import { React, Component, useState, useRef} from 'react';
 //import './css/WorkoutGen.css'
 import ExerciseInfo from './ExerciseInfo';
 import { Button, FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, Alert, TextInput } from 'react-native';
-import RadioButton from 'react-native-paper'
+import { RadioButton } from 'react-native-paper'
 import BouncyCheckbox from 'react-native-bouncy-checkbox'
 import {SelectList, MultipleSelectList} from 'react-native-dropdown-select-list'
 
@@ -11,7 +11,6 @@ import {SelectList, MultipleSelectList} from 'react-native-dropdown-select-list'
 //TODO: need to add in some randomization element (just add in a radio button that would allow for randomization, ask for level of randomization (low, med, high), then save that into account exercise data)
 //TODO: Add X to top of Modal (change Modal return to just return a state variable and just change state variable with X at top to close)
 //TODO: need to reset modal after request
-//TODO: need to create error for when primaryMuscleGroup is empty
 
 export default function WorkoutModalComponent(props){
     const addFunc = props.addFunc
@@ -25,6 +24,7 @@ export default function WorkoutModalComponent(props){
     const [selectedPM, setSPM] = useState([])
     const [selectedSM, setSSM] = useState([])
     const [tags, setST] = useState([])
+    const [rand, setRand] = useState(false)
     let query = useRef({
         equipment: "",
         force: "",
@@ -321,6 +321,8 @@ export default function WorkoutModalComponent(props){
                                 id = 'type'
                     ></SelectList>
 
+                    <RadioButton ></RadioButton>
+
                     <Button title = "Search for Exercises" onPress={() => getExercises()} />
                 </SafeAreaView>
             )
@@ -346,7 +348,7 @@ export default function WorkoutModalComponent(props){
                   }}>
                     <FlatList data = {queryResults.current} renderItem={({item: query}) => <ExerciseInfo hideCheck = {false} addToSelected = {() => setSelectedExcs(addFunc(selectedExcs, query))} exerciseData = {query}/>}>
                     </FlatList>
-                    <Button title = "Add Selected Exercise(s) to Workout" onPress = {() => {addToWorkData(selectedExcs); setShow(false)}} />
+                    <Button title = {rand == true ? 'Add Selected Exercises to Random Exercise' : "Add Selected Exercise(s) to Workout"} onPress = {() => {addToWorkData(selectedExcs); setShow(false)}} />
                 </SafeAreaView>
             )
         }

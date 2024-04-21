@@ -1,7 +1,7 @@
 import { React, Component, useEffect, useState} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import Workout from './Workout';
-import { SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button} from 'react-native';
+import { SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button, Dimensions} from 'react-native';
 import ExerciseInfo from './ExerciseInfo';
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
 import AppNav from "./AppNav.js"
@@ -19,7 +19,7 @@ export default function Home({navigation, route}){
     })
 
     return(
-        <SafeAreaView>
+        <SafeAreaView style = {{height: Dimensions.get('screen').height - 130}}>
             <View style = {{alignItems: "center"}}>
                 <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: data.picture }} />
                 <Text>{data.username}</Text>
@@ -35,7 +35,7 @@ export default function Home({navigation, route}){
                 </View>
             <Button title = "Add Workouts" onPress = {() => {navigation.navigate("WorkoutGen", {userData: data})}}></Button>
             </View>
-            <AppNav />
+            <AppNav userData = {data} navigation = {navigation}/>
         </SafeAreaView>
     )
 

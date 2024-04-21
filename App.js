@@ -3,6 +3,7 @@ import Signup from './Signup';
 import WorkoutHome from './WorkoutHome'
 import Home from './Home'
 //import './css/App.css'
+import MealGenerat from './MealGenerat'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -20,8 +21,9 @@ export default function App() {
         <Stack.Screen name='Landing' component={Landing}/>
         <Stack.Screen name='Signup' component={Signup} />
         <Stack.Screen name='Home' component={Home} />
-        <Stack.Screen name='WorkoutHome' component={WorkoutHome} />
+        <Stack.Screen name='MealGen' component={MealGenerat} />
         <Stack.Screen name='WorkoutGen' component = {WorkoutGenerat} />
+        {/*<Stack.Screen name='Search' component = {Search} />*/}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -4,17 +4,15 @@ import WorkoutModalComp from './WorkoutModalComp';
 import ExerciseInfo from './ExerciseInfo';
 
 //TODO: Need to create functionality to support editing preexisting workouts (can be done with checking if a newly introduced prop that holds already existing workout data is null)
-//TODO: NEED TO FIX USESTATES FOR REMOVEMODE TO ALLOW FOR CHECKBOX AND TRASH BUTTON HIDE/APPEAR BASED ON REMOVEMODE AFTER PRESSING DELETE EXERCISES BUTTON
 
 export default function WorkoutGenerat({navigation, route}){
     let workoutName = useRef("")
     let workoutDesc = useRef("")
     const [newWorkData, setNewWorkData] = useState([]) //holds all data for new workout
     const [show, setShow] = useState(false) //variable that decides whether modal is shown
-    const [removeMode, setRM] = useState(true) //variable that decides whether user can remove exercises from workout
+    const [removeMode, setRM] = useState(0)
     let workoutData = route.params.userData.workouts //all workout data of user
     let deleteExcs = useRef([]) //useRef needs to be used or rerender would be messed up after first rerender
-    let muscleGroups = [] //array that holds tags of musles that are used (MAY NOT BE USED)
 
     useEffect(() => {
         setNewWorkData(newWorkData)
@@ -74,9 +72,7 @@ export default function WorkoutGenerat({navigation, route}){
             //MAPPING BETTER FOR TRANSFORMING, FOR EACH BETTER FOR MUTATING
             excArray.forEach(excData => { //for each item of exercise data
                 if(!temp.some(data => data.exerciseItem.id === excData.id)){ //if data is not already in workoutGenerat exc list
-                    //console.log(excData)
                     temp.push({exerciseItem: excData, sets: 0, reps: 0}) //add to list
-                    //console.log('temp is now '+ temp)
                 }
             });
 
@@ -96,7 +92,7 @@ export default function WorkoutGenerat({navigation, route}){
 
         console.log(JSON.stringify(sendData))
 
-        let response = await fetch('http://localhost:3001/workouts/createWorkout', {
+        let response = await fetch('http://10.0.2.2:3443/workouts/createWorkout', {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type':'application/json'},
@@ -124,11 +120,10 @@ export default function WorkoutGenerat({navigation, route}){
             </View>
             <Text>{"\n"}</Text>
             <Button title = "Add" onPress = {() => setShow(true)} />
-            <Button title = "Delete Exercises" onPress = {() => setRM(true)} />
             <Button title = "Trash Icon Here" onPress = {() => removeExercises()} />
             <Button title = "Save Workout" onPress = {() => saveWorkout()} />
             <View style = {{height: 400}}>
-                <FlatList data = {newWorkData} renderItem={({item})=>(
+                <FlatList data = {newWorkData} keyExtractor={item => item.exerciseItem.id} renderItem={({item})=>(
                     <ExerciseInfo hideCheck = {!removeMode} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.exerciseItem.id); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
                 </FlatList>
             </View>

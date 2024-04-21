@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const excSchema = new mongoose.Schema({
-    id: {type: String}, //api id (if from api)
+    id: {type: String}, //api id / generated id if user gen
     name: {type: String, required: true},
     force: {type: String, required: true},
     equipment: {type: String, required: true},
