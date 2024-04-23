@@ -32,7 +32,7 @@ export default function MealSearchModalComp(props){
         const dietString = formatArray(diet)
         const intolsString = formatArray(intols)
 
-        let rAPI = 'https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?include-tags=' + cuisineString + dietString + intolsString + type.current + '&number=15';
+        let rAPI = 'https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?include-tags=' + cuisineString + dietString + intolsString + type.current + '&number=10';
         const options = {
 	        method: 'GET',
 	        headers: {
@@ -47,6 +47,8 @@ export default function MealSearchModalComp(props){
         } catch (error) {
 	        console.error(error);
         }
+
+        setScreen(2)
     }
 
     if(screenState == 0){

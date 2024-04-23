@@ -2,8 +2,12 @@ const mongoose = require('mongoose')
 
 const mealSchema = new mongoose.Schema({
     id: {type: Number, required: true},
-    title: {type: String, required: true},
+    title: {type: String},
+    summary: {type: String},
     instructions: {type: String},
+    readyInMinutes: {type: Number},
+    imageType: {type: String},
+    servings: {type: Number},
     ingredients: [{
         name: {type: String},
         image: {type: String}
@@ -11,16 +15,8 @@ const mealSchema = new mongoose.Schema({
     equipment: [{
         name: {type: String},
         image: {type: String}
-    }],
-    healthInfo: {
-        calories: {type: Number},
-        fat: {type: Number},
-        carbs: {type: Number},
-        protein: {type: Number},
-        cholesterol: {type: Number},
-        sodium: {type: Number},
-        sugar: {type: Number}
-    }
+    }]
+    //to show health info, just using health widget on spoonacular
 })
 
 const mealModel = mongoose.model("meal", mealSchema)
