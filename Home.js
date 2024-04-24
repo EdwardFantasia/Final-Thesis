@@ -14,7 +14,7 @@ export default function Home({navigation, route}){
     useFocusEffect(() => {
         if(navigation.isFocused()){
             setData(route.params.userData)
-            console.log(route.params.userData)
+            console.log('in home: ' + JSON.stringify(route.params.userData))
         }
     })
 

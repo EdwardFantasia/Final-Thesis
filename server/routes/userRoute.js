@@ -2,15 +2,48 @@ const express = require('express')
 const userModel = require('../models/userModel')
 const exerciseModel = require('../models/exerciseModel')
 const workoutModel = require('../models/workoutModel')
+const mealModel = require('../models/mealModel')
 
 const router = express.Router()
 
-router.get("/getUser/:username", (req, res) => {
+router.get("/getBaseUserI/:userString", (req, res) => {
+    //TODO: NEED TO FINISH
     userModel.find({username: req.params.username}).then((users) => {
         res.json(users)
     }).catch(function(err){
         console.log(err)
     })
+})
+
+router.get("/getMoreUserI/:username", async (req, res) => {
+    //TODO: NEED TO FINISH
+    const user = await userModel.findOne({username: req.params.username})
+    if(user){
+        let temp = []
+        for(let i = 0; i < user.workouts.length; i++){
+            let tmpExcArr = []
+            const workoutObj = await workoutModel.findOne({_id: user.workouts[i]})
+            for(let j = 0; j < workoutObj.exercises.length; j++){
+                let tmpExc = {}
+                const exerciseObj = await exerciseModel.findOne({_id: workoutObj.exercises[j].exerciseItem})
+                tmpExc.exerciseItem = exerciseObj
+                tmpExc.sets = workoutObj.exercises[j].sets
+                tmpExc.reps = workoutObj.exercises[j].reps
+                tmpExcArr.push(tmpExc)
+            }
+            console.log(temp)
+            temp.push({workoutName: workoutObj.workoutName, workoutDesc: workoutObj.workoutDesc, exercises: tmpExcArr})
+        }
+
+        let tempMeals = []
+        for(let i = 0; i < user.meals.length; i++){
+            const mealObj = await mealModel.findOne({_id: user.meals[i]})
+            tempMeals.push(mealObj)
+        }
+
+        console.log("responding with: ", temp)
+        res.json({username: user.username, picture: user.picture, workouts: temp, meals: tempMeals})
+    }
 })
 
 router.patch("/setPic", async (req, res) => {
@@ -45,8 +78,15 @@ router.post("/signIn", async (req, res) => {
             console.log(temp)
             temp.push({workoutName: workoutObj.workoutName, workoutDesc: workoutObj.workoutDesc, exercises: tmpExcArr})
         }
+
+        let tempMeals = []
+        for(let i = 0; i < user.meals.length; i++){
+            const mealObj = await mealModel.findOne({_id: user.meals[i]})
+            tempMeals.push(mealObj)
+        }
+
         console.log("responding with: ", temp)
-        res.json({username: user.username, picture: user.picture, workouts: temp})
+        res.json({username: user.username, picture: user.picture, workouts: temp, meals: tempMeals})
     }
 })
 

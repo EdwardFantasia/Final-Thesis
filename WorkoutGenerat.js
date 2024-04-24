@@ -82,7 +82,6 @@ export default function WorkoutGenerat({navigation, route}){
     }
 
     const saveWorkout = async () => {
-        //TODO: need to save workouts
         const sendData = {
             username: route.params.userData.username,
             workoutName: workoutName.current,
@@ -104,7 +103,7 @@ export default function WorkoutGenerat({navigation, route}){
 
         workoutData = [...workoutData, {workoutName: workoutName.current, workoutDesc: workoutDesc.current, exercises: newWorkData}]
 
-        navigation.navigate("Home", {userData: {username: route.params.userData.username, workouts: workoutData}})
+        navigation.navigate("Home", {userData: {username: route.params.userData.username, workouts: workoutData, meals: route.params.userData.meals}})
 
     }
 

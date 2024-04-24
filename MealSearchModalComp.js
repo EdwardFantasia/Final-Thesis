@@ -112,7 +112,7 @@ export default function MealSearchModalComp(props){
                 shadowRadius: 4,
                 elevation: 5,
             }}>
-                <FlatList data = {apiResults.current} renderItem={({item: query}) => <MealInfo hideCheck = {false} addToSelected = {() => setSelectedMeals(addFunc(selectedMeals, query))} mealData = {query}/>}>
+                <FlatList data = {apiResults.current} renderItem={({item: query}) => <MealInfo addToSelected = {() => setSelectedMeals(addFunc(selectedMeals, query))} mealData = {query}/>}>
                 </FlatList>
                 <Button title = 'Add Selected Meals to Recipebook' onPress = {() => {addToMealData(selectedMeals); setShow(false)}} />
             </SafeAreaView>

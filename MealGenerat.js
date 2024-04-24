@@ -11,7 +11,7 @@ export default function WorkoutGenerat({navigation, route}){
 
     useEffect(() => {
         setNewMealData(newMealData)
-        console.log("NWD: " + JSON.stringify(newMealData))
+        console.log("NMD: " + JSON.stringify(newMealData))
     })
 
     const addGroup = (mutArray, arrayAdd) => {
@@ -38,7 +38,20 @@ export default function WorkoutGenerat({navigation, route}){
         /**
          * Remove exercises from newMealData that match meals in deleteMeals array (removes them from potentially added meals array and de-renders them)
          */
+        setNewMealData(prevMealData => {
+            // Filter out the exercises that need to be removed
+            const tmp = prevMealData.filter(
+                (meal) => {
+                    console.log(meal)
+                    return !deleteMeals.current.includes(meal.id);
+                }
+            );
 
+            // Clear the deleteExcs array
+            deleteMeals.current = [];
+
+            return tmp;
+        })
         
     }
     
@@ -49,16 +62,23 @@ export default function WorkoutGenerat({navigation, route}){
          */
         setNewMealData(prevMealData => {
             //console.log("PREVWORKDATA: ", prevWorkData);
-            let temp = [...prevMealData] + mealData; //get prev data and all data from old userdata (to check if any meal is already in user's meals)
+            let temp = [...prevMealData]
+
+
+            //TODO: check why doubles of meals are occurring
+            temp = temp.concat(mealData) //get prev data and all data from old userdata (to check if any meal is already in user's meals)
+            console.log(JSON.stringify(temp))
             
             //MAPPING BETTER FOR TRANSFORMING, FOR EACH BETTER FOR MUTATING
-            mealArray.forEach(async (mealData) => { //for each item of meal data
+            mealArray.forEach(mealData => { //for each item of meal data
+                console.log('mealData: ' + JSON.stringify(mealData))
                 if(!temp.some(data => data.id === mealData.id)){ //if data is not already in meal list
+                    console.log('passed')
                     let tempMeal = {
                         id: mealData.id,
                         title: mealData.title,
-                        summary: mealData.summary,
-                        instructions: mealData.instructions,
+                        summary: mealData.summary.replace(/<[^>]*>/g, ""), //https://stackoverflow.com/questions/33588514/how-to-remove-string-between-two-characters-every-time-they-occur
+                        instructions: mealData.instructions.replace(/<[^>]*>/g, "").replaceAll("\n", " "),
                         readyInMinutes: mealData.readyInMinutes,
                         imageType: mealData.imageType,
                         servings: mealData.servings,
@@ -73,6 +93,7 @@ export default function WorkoutGenerat({navigation, route}){
                             name: mealData.extendedIngredients[i].name,
                             image: mealData.extendedIngredients[i].image
                         }
+
                         tempMeal.ingredients.push(tempIngred)
                     }
 
@@ -85,11 +106,13 @@ export default function WorkoutGenerat({navigation, route}){
                         for(let j = 0; j < instructions.steps.length; j++){
                             steps = instructions.steps[j]
                             for(let k = 0; k < steps.equipment.length; k++){
-                                tempEquip = {
-                                    name: steps[k].name,
-                                    image: steps[k].image
+                                if(!tempMeal.equipment.some(tempEquip => tempEquip.name === steps.equipment[k].name)){
+                                    tempEquip = {
+                                        name: steps.equipment[k].name,
+                                        image: steps.equipment[k].image
+                                    }
+                                    tempMeal.equipment.push(tempEquip)
                                 }
-                                tempMeal.equipment.push(tempEquip)
                             }
                         }
                     }
@@ -98,14 +121,34 @@ export default function WorkoutGenerat({navigation, route}){
                 }
             });
 
-            console.log(temp)
+            console.log('temp: ' + JSON.stringify(temp))
             return temp; //return temp to set NMD to temp list
         })
     }
 
     const saveMeals = async () => {
-        
+        const sendData = {
+            username: route.params.userData.username,
+            meals: newMealData
+        }
 
+        console.log(JSON.stringify(sendData))
+
+        let response = await fetch('http://10.0.2.2:3443/meals/createMeal', {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type':'application/json'},
+            body: JSON.stringify(sendData)
+        }).then(function(resp){
+            return resp.json()
+        }).catch(error => {})
+        console.log(response)
+
+        mealData = mealData.concat(newMealData)
+
+        console.log('mealData: ' + JSON.stringify(mealData))
+
+        navigation.navigate("Home", {userData: {username: route.params.userData.username, picture: route.params.userData.picture, workouts: route.params.userData.workouts, meals: mealData}})
     }
 
     return(
@@ -113,10 +156,10 @@ export default function WorkoutGenerat({navigation, route}){
             <Button title = "Add Meals" onPress = {() => setShow(true)} />
             <Button title = "Trash Icon Here" onPress = {() => removeMeals()} />
             <Button title = "Save Meals" onPress = {() => saveMeals()} />
-            <Button title = "Cancel Additions" onPress = {() => {}}></Button>
+            <Button title = "Cancel Additions" onPress = {() => navigation.navigate("Home", {userData: {username: route.params.userData.username, picture: route.params.userData.picture, workouts: route.params.userData.workouts, meals: mealData}})}></Button>
             <View style = {{height: 400}}>
                 <FlatList data = {newMealData} keyExtractor={item => item.id} renderItem={({item})=>(
-                   <MealInfo mealData = {item}/>)}>
+                   <MealInfo addToSelected = {() => {console.log('setting deleteMeals to: '); deleteMeals.current = addGroup(deleteMeals.current, item.id); console.log('deleteMeals now set to', deleteMeals.current);}} mealData = {item}/>)}>
                 </FlatList>
             </View>
             <View style = {{
