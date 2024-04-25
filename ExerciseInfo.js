@@ -1,6 +1,6 @@
 import { Component } from "react";
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
-import {View, Text, TextInput} from 'react-native'
+import {View, Text, TextInput, Pressable} from 'react-native'
 import BouncyCheckbox from 'react-native-bouncy-checkbox'
 
 class ExerciseInfo extends Component{

@@ -81,6 +81,7 @@ router.post("/signIn", async (req, res) => {
 
         let tempMeals = []
         for(let i = 0; i < user.meals.length; i++){
+            //TODO: NEED TO REMOVE MONGOOBJ IDS FROM INGREDS AND EQUIP
             const mealObj = await mealModel.findOne({_id: user.meals[i]})
             tempMeals.push(mealObj)
         }

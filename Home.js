@@ -19,7 +19,7 @@ export default function Home({navigation, route}){
     })
 
     return(
-        <SafeAreaView style = {{height: Dimensions.get('screen').height - 130}}>
+        <SafeAreaView style = {{height: Dimensions.get('screen').height - 160}}>
             <View style = {{alignItems: "center"}}>
                 <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: data.picture }} />
                 <Text>{data.username}</Text>

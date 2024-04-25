@@ -1,15 +1,13 @@
 import Landing from './Landing'
 import Signup from './Signup';
-import WorkoutHome from './WorkoutHome'
 import Home from './Home'
-//import './css/App.css'
 import MealGenerat from './MealGenerat'
+import Search from './Search'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WorkoutGenerat from './WorkoutGenerat';
 
-//import "@fontsource/dm-sans";
 import { StyleSheet } from 'react-native';
 
 export default function App() {

@@ -11,17 +11,33 @@ router.post("/createWorkout", async (req, res) => {
         const user = await userModel.findOne({ username: req.body.username })
         if (user) {
             let temp = []
+            let serverResp = [] //response array (name, instructions, objectID)
             for (let i = 0; i < req.body.exercises.length; i++) {
-                const exerciseItem = req.body.exercises[i].exerciseItem
+                let exerciseItem = req.body.exercises[i].exerciseItem
                 let exerciseID = ""
-                const exerciseI = await excModel.findOne({ id: exerciseItem.id })
-                if (exerciseI) {
-                    exerciseID = exerciseI._id;
-                } else {
-                    const newExercise = await excModel.create(exerciseItem)
-                    exerciseID = newExercise._id
+                if(!Array.isArray(exerciseItem)){
+                    const exerciseI = await excModel.findOne({ id: exerciseItem.id })
+                    if (exerciseI) {
+                        exerciseID = exerciseI._id;
+                    } else {
+                        const newExercise = await excModel.create(exerciseItem)
+                        exerciseID = newExercise._id
+                    }
+                    temp.push({ exerciseItem: exerciseID, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
+                }else{
+                    let tmpRand = []
+                    for(let j = 0; j < exerciseItem.length; j++){
+                        const exerciseI = await excModel.findOne({ id: exerciseItem[j].id })
+                        if (exerciseI) {
+                            exerciseID = exerciseI._id;
+                        } else {
+                            const newExercise = await excModel.create(exerciseItem[j])
+                            exerciseID = newExercise._id
+                        }
+                        tmpRand.push(exerciseID)
+                    }
+                    temp.push({exerciseItem: tmpRand, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
                 }
-                temp.push({ exerciseItem: exerciseID, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
             }
             const workout = await workoutModel.create({ workoutName: req.body.workoutName, workoutDesc: req.body.workoutDesc, exercises: temp })
             user.workouts.push(workout._id)

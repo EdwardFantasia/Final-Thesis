@@ -65,7 +65,7 @@ export default function WorkoutGenerat({navigation, route}){
             let temp = [...prevMealData]
 
 
-            //TODO: check why doubles of meals are occurring
+            //TODO: check why doubles of meals are occurring and why \n still appears
             temp = temp.concat(mealData) //get prev data and all data from old userdata (to check if any meal is already in user's meals)
             console.log(JSON.stringify(temp))
             

@@ -7,9 +7,14 @@ export default function Workout({navigation, route, workout}){
     const exercises = workout.exercises
 
     return(
-        <Pressable style = {{borderWidth: 1, borderRadius: 10}}>
+        <View>
             <Text>{workout.workoutName}</Text>
             <Text>{workout.workoutDesc}</Text>
-        </Pressable>
+            {exercises.map(exercise => {
+                <Pressable>
+                    <ExerciseInfo></ExerciseInfo>
+                </Pressable>
+            })}
+        </View>
     )
 }
