@@ -5,7 +5,7 @@ const workoutSchema = new mongoose.Schema({
     workoutDesc: {type: String, required: true},
     exercises: [
         {
-            exerciseItem: {type: mongoose.Schema.ObjectId, required: true}, //mixed due to either holding array of ObjectIds or just one ObjectId
+            exerciseItem: {type: mongoose.Schema.Types.Mixed, required: true}, //mixed due to either holding array of ObjectIds or just one ObjectId
             sets: {type: Number, required: true},
             reps: {type: Number, required: true}
         }

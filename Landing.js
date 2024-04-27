@@ -1,7 +1,6 @@
 import { React, Component} from 'react';
 //import './css/Landing.css'
-import { Dimensions, Modal, StyleSheet, Text, SafeAreaView, View, Image, TextInput, Button, Switch } from 'react-native';
-import WorkoutModalComp from './WorkoutModalComp';
+import { Text, SafeAreaView, View, Image, TextInput, Button } from 'react-native';
 
 class LandingComp extends Component{
     constructor(props){
@@ -39,7 +38,7 @@ class LandingComp extends Component{
 
     render(){
         return(
-            <SafeAreaView>
+            <SafeAreaView style = {{paddingTop: '15%'}}>
                 <View style = {{alignItems: "center"}}>
                     <Image style = {{width: 200, height: 200}} id = 'logo' source = {require('./assets/exc365Logo.png')}></Image>
                         <Text />

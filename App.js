@@ -15,13 +15,13 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName = 'Landing'> 
+      <Stack.Navigator initialRouteName = 'Landing' screenOptions={{headerShown: false}}> 
         <Stack.Screen name='Landing' component={Landing}/>
         <Stack.Screen name='Signup' component={Signup} />
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='MealGen' component={MealGenerat} />
         <Stack.Screen name='WorkoutGen' component = {WorkoutGenerat} />
-        {/*<Stack.Screen name='Search' component = {Search} />*/}
+        <Stack.Screen name='Search' component = {Search} />
       </Stack.Navigator>
     </NavigationContainer>
   );

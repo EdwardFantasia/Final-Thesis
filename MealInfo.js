@@ -6,11 +6,11 @@ export default function MealInfo(props){
     const mealDataName = props.mealData.title
     const mealDataSumm = props.mealData.summary.replace(/<[^>]*>/g, "")
     return(
-        <View>
-            <BouncyCheckbox onPress = {() => props.addToSelected()}></BouncyCheckbox>
-                <CollapsibleView title = {mealDataName}>
+        <View style = {{flexDirection: 'row', justifyContent: 'center'}}>
+            <BouncyCheckbox fillColor="#2196F3" onPress = {() => props.addToSelected()}></BouncyCheckbox>
+                <CollapsibleView style = {{width: '75%'}} title = {<Text>{mealDataName}</Text>}>
                     <View>
-                        {<Text>{mealDataSumm}</Text>}
+                        <Text style = {{textAlign: "center"}}>{mealDataSumm}</Text>
                     </View>
                 </CollapsibleView>
         </View>

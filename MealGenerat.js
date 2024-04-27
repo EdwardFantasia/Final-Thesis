@@ -144,7 +144,7 @@ export default function WorkoutGenerat({navigation, route}){
         }).catch(error => {})
         console.log(response)
 
-        mealData = mealData.concat(newMealData)
+        mealData = mealData.concat(response)
 
         console.log('mealData: ' + JSON.stringify(mealData))
 
@@ -152,15 +152,21 @@ export default function WorkoutGenerat({navigation, route}){
     }
 
     return(
-        <SafeAreaView>
-            <Button title = "Add Meals" onPress = {() => setShow(true)} />
-            <Button title = "Trash Icon Here" onPress = {() => removeMeals()} />
-            <Button title = "Save Meals" onPress = {() => saveMeals()} />
-            <Button title = "Cancel Additions" onPress = {() => navigation.navigate("Home", {userData: {username: route.params.userData.username, picture: route.params.userData.picture, workouts: route.params.userData.workouts, meals: mealData}})}></Button>
-            <View style = {{height: 400}}>
+        <SafeAreaView style = {{paddingTop: '15%', justifyContent: 'center'}}>
+            <View style = {{alignItems: 'center', flexDirection: 'column', justifyContent: "center"}}>
+                <Button title = "Add Meals" onPress = {() => setShow(true)} />
+                <View style = {{height: 30}}></View>
+                <Button title = "Delete Selected" onPress = {() => removeMeals()} />
+            </View>
+            <View style = {{marginVertical: 20, height: 'auto'}}>
                 <FlatList data = {newMealData} keyExtractor={item => item.id} renderItem={({item})=>(
                    <MealInfo addToSelected = {() => {console.log('setting deleteMeals to: '); deleteMeals.current = addGroup(deleteMeals.current, item.id); console.log('deleteMeals now set to', deleteMeals.current);}} mealData = {item}/>)}>
                 </FlatList>
+            </View>
+            <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
+                <Button title = "Save Meals" onPress = {() => saveMeals()} />
+                <View style = {{width: 30}}></View>
+                <Button title = "Cancel Additions" onPress = {() => navigation.navigate("Home", {userData: {username: route.params.userData.username, picture: route.params.userData.picture, workouts: route.params.userData.workouts, meals: mealData}})}></Button>
             </View>
             <View style = {{
                 //source: https://reactnative.dev/docs/modal

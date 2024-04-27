@@ -1,7 +1,7 @@
 //use of route source: https://www.youtube.com/watch?v=GkH_VeAeur8
 
 import { React, useRef, useState} from 'react';
-import { Image, Button, Text, TextInput, SafeAreaView } from 'react-native';
+import { Image, Button, Text, TextInput, SafeAreaView, View } from 'react-native';
 import { firebaseStorage } from './firebaseConfig'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import * as ImagePicker from 'expo-image-picker'
@@ -83,27 +83,36 @@ export default function Signup({navigation, route}){
     }
 
     return(
-        <SafeAreaView style = {{alignItems: "center"}}>
+        <SafeAreaView style = {{paddingTop: '15%', alignItems: "center"}}>
             <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: pfp }}></Image>
             <Text />
             <Button title = "Choose Profile Picture" onPress = {() => pfpSelect()}></Button>
             <Text />
 
-            <Text id = 'fnameL'>First Name</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.firstname = text} id = 'fName'></TextInput>
-
-            <Text id = 'lnameL'>Last Name</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.lastname = text} id = 'lName'></TextInput>
-
-            <Text id = 'emailL'>Email</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.email = text} id = 'emailI'></TextInput>
-
-            <Text id = 'unameL'>Username</Text>
-            <TextInput maxLength = {25} style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.username = text} id = 'uName'></TextInput>
+            <View style = {{paddingBottom: 10}}>
+                <Text style = {{textAlign: 'center'}} id = 'fnameL'>First Name</Text>
+                <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.firstname = text} id = 'fName'></TextInput>
+            </View>
             
-            <Text id = 'pwL'>Password</Text>
-            <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.password = text} id = 'pw'></TextInput>
+            <View style = {{paddingBottom: 10}}>
+                <Text style = {{textAlign: 'center'}} id = 'lnameL'>Last Name</Text>
+                <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.lastname = text} id = 'lName'></TextInput>
+            </View>
 
+            <View style = {{paddingBottom: 10}}>
+                <Text style = {{textAlign: 'center'}} id = 'emailL'>Email</Text>
+                <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.email = text} id = 'emailI'></TextInput>
+            </View>
+
+            <View style = {{paddingBottom: 10}}>
+                <Text style = {{textAlign: 'center'}} id = 'unameL'>Username</Text>
+                <TextInput maxLength = {25} style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.username = text} id = 'uName'></TextInput>
+            </View>
+
+            <View style = {{paddingBottom: 10}}>
+                <Text style = {{textAlign: 'center'}} id = 'pwL'>Password</Text>
+                <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText={text => creationBody.current.password = text} id = 'pw'></TextInput>
+            </View>
             <Text />
 
             <Button title = "Sign Up" onPress = {() => signUpUser()} />

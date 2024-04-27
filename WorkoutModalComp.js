@@ -3,8 +3,8 @@ import { React, Component, useState, useRef} from 'react';
 import ExerciseInfo from './ExerciseInfo';
 import { Button, FlatList, SafeAreaView, Pressable, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, Alert, TextInput } from 'react-native';
 import { RadioButton } from 'react-native-paper'
-import BouncyCheckbox from 'react-native-bouncy-checkbox'
 import {SelectList, MultipleSelectList} from 'react-native-dropdown-select-list'
+import uuid from 'react-native-uuid'
 
 /*API: https://rapidapi.com/brianliong1999-aAas5mGoYZv/api/advanced-exercise-finder */
 
@@ -20,6 +20,7 @@ export default function WorkoutModalComponent(props){
     const [selectedSM, setSSM] = useState([])
     const [tags, setST] = useState([])
     const [rand, setRand] = useState(false)
+    const [create, setCreate] = useState(false)
     let query = useRef({
         equipment: "",
         force: "",
@@ -40,6 +41,9 @@ export default function WorkoutModalComponent(props){
     let pmChecks = useRef([])
     let smChecks = useRef([])
     let queryResults = useRef([])
+
+    let createName = useRef("")
+    let createInstr = useRef("")
 
     const queryCreation = queryParam => {
         if((typeof query.current[queryParam] == "string" && query.current[queryParam] != "") || (query.current[queryParam].length != 0)){ //if this field of query is either a non-empty string or a non-empty array...
@@ -110,7 +114,7 @@ export default function WorkoutModalComponent(props){
 	        queryResults.current = JSON.parse(await response.text())['data']['exercises']
 
             console.log(queryResults)
-            setScreen(4)
+            setScreen(3)
         } catch (error) {
 	        console.error(error);
         }
@@ -122,7 +126,7 @@ export default function WorkoutModalComponent(props){
          * @param {Number} screenNum: number to set modal screen to
          */
         switch(screenNum){
-            case 3:
+            case 2:
                 {/*Map this and get every exc related to muscGroup*/}
                 selectedPMG.map((muscGroup) => {
                     pmChecks.current = pmChecks.current.concat(excsByGroup[muscGroup.toLowerCase()])
@@ -168,47 +172,13 @@ export default function WorkoutModalComponent(props){
                     <Text style = {{color: '#c3c2c3', paddingBottom: .75, paddingRight: 2, padding: 1, borderStyle: "solid", borderWidth: 1, borderRadius: 10, borderColor: '#c3c2c3'}}> X</Text>
                 </Pressable>
                 <View style = {{alignItems: 'center'}}>
-                    <Button title = "Create Workout" onPress={() => setScreen(1)} />
-                    <Button title = "Import Workout" onPress={() => setScreen(2)} />
-                </View>
-            </SafeAreaView>
-        )
-        }else if(screenState == 1){
-            {/*Return create workout modal page*/}
-            return(
-            <SafeAreaView style = {{
-                //source: https://reactnative.dev/docs/modal
-                margin: 20,
-                backgroundColor: 'white',
-                borderRadius: 20,
-                padding: 35,
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 4,
-                elevation: 5,
-              }}>
-                <Pressable onPress = {() => setShow(0)} style = {{flexDirection: 'row-reverse', paddingBottom: 5}}>
-                    <Text style = {{color: '#c3c2c3', paddingBottom: .75, paddingRight: 2, padding: 1, borderStyle: "solid", borderWidth: 1, borderRadius: 10, borderColor: '#c3c2c3'}}> X</Text>
-                </Pressable>
-                <View style = {{alignItems: 'center'}}>
-                    <Text>Exercise Name</Text>
-                    <TextInput id = 'excName'></TextInput>
-                    <Text>Exercise Description</Text>
-                    <TextInput id = 'excDesc'></TextInput>
-                    <Text>Sets: </Text>
-                    <TextInput id = 'sets'></TextInput>
-                    <Text>Reps: </Text>
-                    <TextInput id = 'reps'></TextInput>
-                    <Button title = "Save Exercise" />
+                    <Button title = "Create Exercise" onPress={() => {setCreate(true); setScreen(1)}} />
+                    <Button title = "Import Exercises" onPress={() => setScreen(1)} />
                 </View>
             </SafeAreaView>
         )
         }
-        else if (screenState == 2){
+        else if (screenState == 1){
             {/*First page of import workout sequence*/}
             return(
                 <SafeAreaView style = {{
@@ -230,23 +200,29 @@ export default function WorkoutModalComponent(props){
                         <Text style = {{color: '#c3c2c3', paddingBottom: .75, paddingRight: 2, padding: 1, borderStyle: "solid", borderWidth: 1, borderRadius: 10, borderColor: '#c3c2c3'}}> X</Text>
                     </Pressable>
                     <View style = {{alignItems: 'center'}}>
-                        <Text style = {{textAlign: 'center'}}>Any keywords you wish to search for?</Text>
-                        <TextInput></TextInput>
+                        {create && 
+                            <View>
+                                <Text>Name of Exercise</Text>
+                                <TextInput onChangeText={text => {createName.current = text}}></TextInput>
 
-                        <Text>What equipment do you want to use?</Text>
+                                <Text>Exericse Instructions</Text>
+                                <TextInput onChangeText={text => createInstr.current = text}></TextInput>
+                            </View>
+                        }
+                        <Text>{create ? "What equipment do you want this exercise to use?" : "What equipment do you want to use?"}</Text>
                         <SelectList
-                            data = {["Doesn't Matter", "None", "Barbell", "Dumbells", "Machine", "Cable", "Kettlebell", "Resistance Band", "Resistance Band Assisted", "EZ Curl Barbell", "Trap Bar", "Smith Machine", "Body Weight", "Weighted", "Misc"]}
+                            data = {["Doesn't Matter", "Barbell", "Dumbells", "Machine", "Cable", "Kettlebell", "Resistance Band", "Resistance Band Assisted", "EZ Curl Barbell", "Trap Bar", "Smith Machine", "Body Weight", "Weighted", "Misc"]}
                             setSelected = {val => query.current.equipment = (val == "Doesn't Matter" ? "" : val)}
                             id = "equip"
                         ></SelectList>
 
-                        <Text>What primary muscle groups do you wish to exercise?</Text>
+                        <Text>{create ? "What primary muscle groups does this exercise work?" : "What primary muscle groups do you wish to exercise?"}</Text>
                         <MultipleSelectList data = {["Back","Chest","Shoulders","Arms","Legs","Core"]}
                                             setSelected={val => setSPMG(val)}
                                             id = "pmg"
                         ></MultipleSelectList>
 
-                        <Text>What secondary muscle groups do you wish to exercise?</Text>
+                        <Text>{create ? "What secondary muscle groups does this exercise work?" : "What secondary muscle groups do you wish to exercise?"}</Text>
                         <View>
                             <MultipleSelectList data = {["Back","Chest","Shoulders","Arms","Legs","Core"]}
                                                 setSelected = {val => setSSMG(val)}
@@ -254,19 +230,19 @@ export default function WorkoutModalComponent(props){
                             ></MultipleSelectList>
                         </View>
 
-                        <Text>What force do you wish to use for this exercise?</Text>
+                        <Text>{create ? "What force does this exericse use?" : "What force do you wish to use for this exercise?"}</Text>
                         <SelectList
-                            data = {["Doesn't Matter", "Push", "Pull", "Push and Pull"]}
-                            setSelected = {val => query.current.force = (val == "Doesn't Matter" ? "" : val)}
+                            data = {[create ? "N/A" : "Doesn't Matter", "Push", "Pull", "Push and Pull"]}
+                            setSelected = {val => query.current.force = (val == "Doesn't Matter" || "N/A" ? "" : val)}
                             id = "force"
                         ></SelectList>
                         <Text> {'\n'}</Text>
-                        <Button title = "Next Page" onPress = {() => screenEst(3)} />
+                        <Button title = "Next Page" onPress = {() => screenEst(2)} />
                     </View>
                 </SafeAreaView>
             )
         }
-        else if (screenState == 3){
+        else if (screenState == 2){
             return(
                 <SafeAreaView style = {{
                     //source: https://reactnative.dev/docs/modal
@@ -287,7 +263,7 @@ export default function WorkoutModalComponent(props){
                         <Text style = {{color: '#c3c2c3', paddingBottom: .75, paddingRight: 2, padding: 1, borderStyle: "solid", borderWidth: 1, borderRadius: 10, borderColor: '#c3c2c3'}}> X</Text>
                     </Pressable>
                     <View style = {{alignItems: 'center'}}>
-                        <Text>Please pick the primary muscles you wish these exercises to work.</Text>
+                        <Text>{create ? "What primary muscles does this exercise work?" : "Please pick the primary muscles you wish these exercises to work"}</Text>
                         <MultipleSelectList data = {[{value: "Trapezius", disabled: !pmChecks.current.includes("Trapezius")}, {value: "Erector Spinae", disabled: !pmChecks.current.includes("Erector Spinae")}, {value: "Latissimus Dorsi", disabled: !pmChecks.current.includes("Latissimus Dorsi")},
                                                     {value: "Upper Chest", disabled: !pmChecks.current.includes("Upper Chest")}, {value: "Lower Chest", disabled: !pmChecks.current.includes("Lower Chest")}, {value: "Pectoralis Minor", disabled: !pmChecks.current.includes("Pectoralis Minor")},
                                                     {value: "Anterior Deltoid", disabled: !pmChecks.current.includes("Anterior Deltoid")}, {value: "Lateral Deltoid", disabled: !pmChecks.current.includes("Lateral Deltoid")}, {value: "Posterior Deltoid", disabled: !pmChecks.current.includes("Posterior Deltoid")},
@@ -300,7 +276,7 @@ export default function WorkoutModalComponent(props){
                                             id = "pm"
                         ></MultipleSelectList>
                         
-                        <Text>Please pick the secondary muscles you wish these exercises to work.</Text>
+                        <Text>{create ? "What secondary muscles does this exercise work?" : "Please pick the secondary muscles you wish these exercises to work"}</Text>
                         <MultipleSelectList data = {[{value: "Trapezius", disabled: !smChecks.current.includes("Trapezius")}, {value: "Erector Spinae", disabled: !smChecks.current.includes("Erector Spinae")}, {value: "Latissimus Dorsi", disabled: !smChecks.current.includes("Latissimus Dorsi")},
                                                     {value: "Upper Chest", disabled: !smChecks.current.includes("Upper Chest")}, {value: "Lower Chest", disabled: !smChecks.current.includes("Lower Chest")}, {value: "Pectoralis Minor", disabled: !smChecks.current.includes("Pectoralis Minor")},
                                                     {value: "Anterior Deltoid", disabled: !smChecks.current.includes("Anterior Deltoid")}, {value: "Lateral Deltoid", disabled: !smChecks.current.includes("Lateral Deltoid")}, {value: "Posterior Deltoid", disabled: !smChecks.current.includes("Posterior Deltoid")},
@@ -313,29 +289,33 @@ export default function WorkoutModalComponent(props){
                                             id = "sm"
                         ></MultipleSelectList>
                         
-                        <Text>Please select any tags you wish the exercises to follow:</Text>
+                        <Text>{create ? "What tags apply to this exercise?" : "Please select any tags you wish the exercises to follow"}</Text>
                         <MultipleSelectList data = {["Powerlifting", "Olympic", "Strongman", "Calisthenics", "Plyometric"]}
                                             setSelected={val => {setST(val)}}
                                             id = "tag"
                         ></MultipleSelectList>
 
-                        <Text>Please select the type of exercise you want to search for:</Text>
+                        <Text>{create ? "What type of exercise is this?" : "Please select the type of exercise you want to search for"}</Text>
 
-                        <SelectList data = {["Doesn't Matter", "Compound", "Isolation"]}
-                                    setSelected = {val => query.current.type = (val == "Doesn't Matter" ? "" : val)}
+                        <SelectList data = {[create ? "N/A" : "Doesn't Matter", "Compound", "Isolation"]}
+                                    setSelected = {val => query.current.type = (val == "Doesn't Matter" || "N/A" ? "" : val)}
                                     id = 'type'
                         ></SelectList>
-                        <Text>{'\n'}</Text>
 
-                        <Text>Randomize Exercise</Text>
-                        <RadioButton value = {!rand} status = {rand ? 'checked' : 'unchecked'} onPress = {() => setRand(!rand)}></RadioButton>
+                        {!create && 
+                        <View>
+                            <Text>{'\n'}</Text>
 
-                        <Button title = "Search for Exercises" onPress={() => getExercises()} />
+                            <Text>Randomize Exercise</Text>
+                            <RadioButton value = {!rand} status = {rand ? 'checked' : 'unchecked'} onPress = {() => setRand(!rand)}></RadioButton>
+                        </View>
+                        }
+                        <Button title = {create ? "Create Exercise" : "Search for Exercises"} onPress={create ? () => {addToWorkData({id: "exc365" + uuid.v4(), name: createName.current, force: query.current.force, equipment: query.current.equipment, instructions: createInstr.current, primaryMuscleGroups: selectedPMG, primaryMuscles: selectedPM, secondaryMuscleGroups: selectedSMG, secondaryMuscles: selectedSM, tags: tags, type: query.current.type}, rand, create); setShow(0)} : () => getExercises()} />
                     </View>
                 </SafeAreaView>
             )
         }
-        else if (screenState == 4){ {/*Results Page*/}
+        else if (screenState == 3){ {/*Results Page*/}
             return(
                 <SafeAreaView style = {{
                     //source: https://reactnative.dev/docs/modal
@@ -356,9 +336,9 @@ export default function WorkoutModalComponent(props){
                     <Pressable onPress = {() => setShow(0)} style = {{flexDirection: 'row-reverse', paddingBottom: 5}}>
                         <Text style = {{color: '#c3c2c3', paddingBottom: .75, paddingRight: 2, padding: 1, borderStyle: "solid", borderWidth: 1, borderRadius: 10, borderColor: '#c3c2c3'}}> X</Text>
                     </Pressable>
-                    <FlatList data = {queryResults.current} renderItem={({item: query}) => <ExerciseInfo hideCheck = {false} addToSelected = {() => setSelectedExcs(addFunc(selectedExcs, query))} exerciseData = {query}/>}>
+                    <FlatList data = {queryResults.current} renderItem={({item: query}) => <ExerciseInfo hideCheck = {false} hideSAR = {true} addToSelected = {() => setSelectedExcs(addFunc(selectedExcs, query))} exerciseData = {query}/>}>
                     </FlatList>
-                    <Button title = {rand ? 'Add Selected Exercises to Random Exercise' : "Add Selected Exercise(s) to Workout"} onPress = {() => {addToWorkData(selectedExcs, rand); setShow(false)}} />
+                    <Button title = {rand ? 'Add Selected Exercises to Random Exercise' : "Add Selected Exercise(s) to Workout"} onPress = {() => {addToWorkData(selectedExcs, rand, create); setShow(false)}} />
                 </SafeAreaView>
             )
         }

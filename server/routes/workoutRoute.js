@@ -16,33 +16,37 @@ router.post("/createWorkout", async (req, res) => {
                 let exerciseItem = req.body.exercises[i].exerciseItem
                 let exerciseID = ""
                 if(!Array.isArray(exerciseItem)){
-                    const exerciseI = await excModel.findOne({ id: exerciseItem.id })
+                    let exerciseI = await excModel.findOne({ id: exerciseItem.id })
                     if (exerciseI) {
                         exerciseID = exerciseI._id;
                     } else {
-                        const newExercise = await excModel.create(exerciseItem)
+                        let newExercise = await excModel.create(exerciseItem)
                         exerciseID = newExercise._id
                     }
                     temp.push({ exerciseItem: exerciseID, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
+                    serverResp.push({exerciseItem: {_id: exerciseID, name: exerciseItem.name, instructions: exerciseItem.instructions}, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps})
                 }else{
                     let tmpRand = []
+                    let randServArr = []
                     for(let j = 0; j < exerciseItem.length; j++){
-                        const exerciseI = await excModel.findOne({ id: exerciseItem[j].id })
+                        let exerciseI = await excModel.findOne({ id: exerciseItem[j].id })
                         if (exerciseI) {
                             exerciseID = exerciseI._id;
                         } else {
-                            const newExercise = await excModel.create(exerciseItem[j])
+                            let newExercise = await excModel.create(exerciseItem[j])
                             exerciseID = newExercise._id
                         }
                         tmpRand.push(exerciseID)
+                        randServArr.push({_id: exerciseID, name: exerciseItem[j].name, instructions: exerciseItem[j].instructions})
                     }
                     temp.push({exerciseItem: tmpRand, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
+                    serverResp.push({exerciseItem: randServArr, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
                 }
             }
             const workout = await workoutModel.create({ workoutName: req.body.workoutName, workoutDesc: req.body.workoutDesc, exercises: temp })
             user.workouts.push(workout._id)
             await user.save()
-            res.json({ success: true })
+            res.json({resp: serverResp})
         } else {
             res.status(404).json({ error: "User not found" });
         }

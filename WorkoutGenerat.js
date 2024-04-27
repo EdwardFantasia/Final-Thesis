@@ -5,13 +5,13 @@ import ExerciseInfo from './ExerciseInfo';
 import uuid from 'react-native-uuid'
 
 //TODO: Need to create functionality to support editing preexisting workouts (can be done with checking if a newly introduced prop that holds already existing workout data is null)
+//TODO: need to fix issue with ternary in equip data
 
 export default function WorkoutGenerat({navigation, route}){
     let workoutName = useRef("")
     let workoutDesc = useRef("")
     const [newWorkData, setNewWorkData] = useState([]) //holds all data for new workout
     const [show, setShow] = useState(false) //variable that decides whether modal is shown
-    const [removeMode, setRM] = useState(false)
     let workoutData = route.params.userData.workouts //all workout data of user
     let deleteExcs = useRef([]) //useRef needs to be used or rerender would be messed up after first rerender
 
@@ -61,7 +61,7 @@ export default function WorkoutGenerat({navigation, route}){
         })
     }
     
-    const addToWorkData = (excArray, rand) => { 
+    const addToWorkData = (excArray, rand, create) => { 
         /**
          * PROP FUNCTION EXCLUSIVELY FOR MODAL
          * @param {Array} excArray: array to have added to newWorkData state array
@@ -69,12 +69,17 @@ export default function WorkoutGenerat({navigation, route}){
         setNewWorkData(prevWorkData => {
             //console.log("PREVWORKDATA: ", prevWorkData);
             let temp = [...prevWorkData]; //get prev data
-                        //TODO: need to create randomization factor
-
-            //MAPPING BETTER FOR TRANSFORMING, FOR EACH BETTER FOR MUTATING
-            if(!rand){
+            if(create){
+                if(temp.flat().some(data => data.exerciseItem.name + "_" + data.exerciseItem.equipment == excArray.name + "_" + excArray.equipment)){
+                    return temp
+                }
+                else(
+                    temp.push({exerciseItem: excArray, sets: 0, reps: 0, tmpListID: uuid.v4()}) //add to list
+                )
+            }
+            else if(!rand){ //MAPPING BETTER FOR TRANSFORMING, FOR EACH BETTER FOR MUTATING
                 excArray.forEach(excData => { //for each item of exercise data
-                    if(!temp.flat().some(data => data.exerciseItem.id === excData.id)){ //if data is not already in workoutGenerat exc list
+                    if(!temp.flat().some(data => data.exerciseItem.id == excData.id)){ //if data is not already in workoutGenerat exc list
                         temp.push({exerciseItem: excData, sets: 0, reps: 0, tmpListID: uuid.v4()}) //add to list
                     }
                 });
@@ -87,7 +92,7 @@ export default function WorkoutGenerat({navigation, route}){
                         tmpRand.push(excData) //add to list
                     }
                 })
-                temp.push({exerciseItem: tmpRand, sets: 0, reps: 0, tmpListID: uuid.v4()})
+                temp.push({exerciseItem: tmpRand, sets: 0, reps: 0, tmpListID: uuid.v4()}) //need tmpListID to support randomized list of exercises
             }
 
             console.log(temp)
@@ -115,31 +120,37 @@ export default function WorkoutGenerat({navigation, route}){
         }).catch(error => {})
         console.log(response)
 
-        workoutData = [...workoutData, {workoutName: workoutName.current, workoutDesc: workoutDesc.current, exercises: newWorkData}]
+        workoutData = [...workoutData, {workoutName: workoutName.current, workoutDesc: workoutDesc.current, exercises: response.resp}]
 
         navigation.navigate("Home", {userData: {username: route.params.userData.username, picture: route.params.userData.picture, workouts: workoutData, meals: route.params.userData.meals}})
 
     }
 
     return(
-        <SafeAreaView>
-            <View>
+        <SafeAreaView style = {{paddingTop: '15%'}}>
+            <View style = {{alignItems: 'center'}}>
                 <Text>Workout Name</Text>
-                <TextInput onChangeText = {text => workoutName.current = text} id = 'workName'></TextInput>
-            </View>
-            <View>
+                <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText = {text => workoutName.current = text} id = 'workName'></TextInput>
+                <Text />
                 <Text>Workout Description</Text>
-                <TextInput onChangeText = {text => workoutDesc.current = text} id = 'workDesc'></TextInput>
+                <TextInput style = {{width: 300, height: 50, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} multiline = {true} onChangeText = {text => workoutDesc.current = text} id = 'workDesc'></TextInput>
             </View>
-            <Text>{"\n"}</Text>
-            <Button title = "Add" onPress = {() => setShow(true)} />
-            <Button title = "Trash Icon Here" onPress = {() => removeExercises()} />
-            <View style = {{borderColor: 'black', borderWidth: 1, borderRadius: 5, height: 'auto'}}>
+            <Text />
+            <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: "center"}}>
+                <Button title = "Add Exercises" onPress = {() => setShow(true)} />
+                <View style = {{width: 30}}></View>
+                <Button title = "Delete Selected" onPress = {() => removeExercises()} />
+            </View>
+            <View style = {{marginVertical: 20, height: 'auto'}}>
                 <FlatList data = {newWorkData} keyExtractor={item => item.tmpListID} renderItem={({item})=>(
-                    <ExerciseInfo hideCheck = {!removeMode} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
+                    <ExerciseInfo hideCheck = {false} hideSAR = {false} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
                 </FlatList>
             </View>
-            <Button title = "Save Workout" onPress = {() => saveWorkout()} />
+            <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
+                <Button title = "Save Workout" onPress = {() => saveWorkout()} />
+                <View style = {{width: 30}}></View>
+                <Button title = "Back to Home" onPress = {() => {}} />
+            </View>
             <View style = {{
                 //source: https://reactnative.dev/docs/modal
                 flex: 1,
