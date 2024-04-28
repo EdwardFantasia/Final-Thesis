@@ -4,6 +4,7 @@ const excModel = require('../models/exerciseModel')
 const userModel = require('../models/userModel')
 
 const router = express.Router()
+//TODO: IF THERE IS TIME, CREATE A WAY TO CHECK IF CREATED WORKOUT MATCHES AN EXC IN DB ALREADY (CHECK IF ID INCLUDES EXC365 THEN IF TRUE, CHECK ALL PARAMS EXCEPT ID)
 
 router.post("/createWorkout", async (req, res) => {
     //TRY TO REWRITE

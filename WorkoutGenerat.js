@@ -3,15 +3,18 @@ import { Modal, Dimensions, FlatList, SafeAreaView, ScrollView, StatusBar, Style
 import WorkoutModalComp from './WorkoutModalComp';
 import ExerciseInfo from './ExerciseInfo';
 import uuid from 'react-native-uuid'
+import ExerciseTabInfo from './ExerciseTabInfo';
 
 //TODO: Need to create functionality to support editing preexisting workouts (can be done with checking if a newly introduced prop that holds already existing workout data is null)
-//TODO: need to fix issue with ternary in equip data
+//TODO: need to fix issue with ternaries in equip attr lists
 
 export default function WorkoutGenerat({navigation, route}){
     let workoutName = useRef("")
     let workoutDesc = useRef("")
     const [newWorkData, setNewWorkData] = useState([]) //holds all data for new workout
     const [show, setShow] = useState(false) //variable that decides whether modal is shown
+    const [moreExcInfo, setMEI] = useState(false)
+    const [modalExc, setModalExc] = useState({})
     let workoutData = route.params.userData.workouts //all workout data of user
     let deleteExcs = useRef([]) //useRef needs to be used or rerender would be messed up after first rerender
 
@@ -19,6 +22,11 @@ export default function WorkoutGenerat({navigation, route}){
         setNewWorkData(newWorkData)
         console.log("NWD: " + JSON.stringify(newWorkData))
     })
+
+    const modalDisplayExc = (exercise) => {
+        setModalExc(exercise)
+        setMEI(true)
+    }
 
     const addGroup = (mutArray, arrayAdd) => {
         /**
@@ -143,7 +151,7 @@ export default function WorkoutGenerat({navigation, route}){
             </View>
             <View style = {{marginVertical: 20, height: 'auto'}}>
                 <FlatList data = {newWorkData} keyExtractor={item => item.tmpListID} renderItem={({item})=>(
-                    <ExerciseInfo hideCheck = {false} hideSAR = {false} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
+                    <ExerciseInfo modalDisplay = {() => modalDisplayExc(item)} hideCheck = {false} hideSAR = {false} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
                 </FlatList>
             </View>
             <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
@@ -158,6 +166,9 @@ export default function WorkoutGenerat({navigation, route}){
                 alignItems: 'center'}}>
                 <Modal transparent = {true} visible = {show}>
                     <WorkoutModalComp addToWorkData = {addToWorkData} addFunc = {addGroup} setShow = {setShow}></WorkoutModalComp>
+                </Modal>
+                <Modal transparent = {true} visible = {moreExcInfo}>
+                    <ExerciseTabInfo exercise = {modalExc}/>
                 </Modal>
             </View>
         </SafeAreaView>

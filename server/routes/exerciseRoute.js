@@ -3,18 +3,11 @@ const excModel = require('../models/exerciseModel')
 
 const router = express.Router()
 
-router.get("/", (req, res) => {
-    
+router.get("/getExercise/:id", async (req, res) => {
+    const exc = await excModel.findOne({_id: req.params.id})
+    if(exc){
+        res.json(exc)
+    }
 })
-
-router.post("/", (req, res) => {
-    
-})
-
-router.post("/", async (req, res) => {
-    
-})
-
-//if able to implement, if exc is edited, need to remove apiID if not null
 
 module.exports = router

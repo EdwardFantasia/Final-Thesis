@@ -7,7 +7,7 @@ export default function AppNav(props){
     const navigation = props.navigation
     const userData = props.userData
     return(
-        <View style = {{position: 'absolute', flexDirection: "row", bottom: 0, borderTopWidth: 1, paddingTop: 10}}>
+        <View style = {{position: 'absolute', flexDirection: "row", borderTopWidth: 1, paddingTop: 10}}>
             <Pressable onPress={() => navigation.navigate("Home", {userData: userData})} style = {{flex: 1}}>
                 <View style = {{alignItems: "center"}}>
                     <Image source = {require('./assets/navIcons/homeNav.png')} />

@@ -68,7 +68,6 @@ router.post("/signIn", async (req, res) => {
             let tmpExcArr = []
             let workoutObj = await workoutModel.findOne({_id: user.workouts[i]})
             for(let j = 0; j < workoutObj.exercises.length; j++){
-                //TODO: add in conditional for if array
                 let tmpExc = {}
                 if(!Array.isArray(workoutObj.exercises[j].exerciseItem)){
                     const exerciseObj = await exerciseModel.findOne({_id: workoutObj.exercises[j].exerciseItem})
@@ -91,7 +90,7 @@ router.post("/signIn", async (req, res) => {
                 tmpExcArr.push(tmpExc)
             }
             console.log(temp)
-            temp.push({workoutName: workoutObj.workoutName, workoutDesc: workoutObj.workoutDesc, exercises: tmpExcArr})
+            temp.push({_id: workoutObj._id, workoutName: workoutObj.workoutName, workoutDesc: workoutObj.workoutDesc, exercises: tmpExcArr})
         }
 
         let tempMeals = []

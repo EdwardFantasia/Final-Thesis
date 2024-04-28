@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
 
 export default function Signup({navigation, route}){
+    //TODO: CHANGE NAV TO GO TO LOGIN TO THEN LOGIN TO CHECK FOR AUTHENTICATION
 
     const creationBody = useRef({
         username: "",

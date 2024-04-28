@@ -1,15 +1,33 @@
 import { React, Component, useEffect, useState} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import Workout from './Workout';
-import { SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button, Dimensions} from 'react-native';
+import { Modal, SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button, Dimensions} from 'react-native';
+import MealInfo from './MealInfo.js'
 import ExerciseInfo from './ExerciseInfo';
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
 import AppNav from "./AppNav.js"
+import ExerciseTabInfo from './ExerciseTabInfo.js';
 
 export default function Home({navigation, route}){
-    const [dataBool, setDataBool] = useState('workouts')
-    
+    const [dataBool, setDataBool] = useState(false)
+    const [deleteMode, setDeleteMode] = useState(false)
     const [data, setData] = useState(route.params.userData) //holds username, meals, pfp, and workouts
+    const [modalShow, setModalShow] = useState(false)
+    const [modalData, setModalData] = useState({})
+
+    const modalDisplayExc = async function(exerciseID){
+        const exercise = await fetch('http://10.0.2.2:3443/exercises/getExercise/' + exerciseID, {
+            method: 'GET',
+            mode: 'cors',
+            headers: { 'Content-Type':'application/json'}
+        }).then(function(resp){
+            return resp.json()
+        })
+        console.log('exercise: ' + JSON.stringify(exercise))
+
+        setModalData({exerciseItem: exercise})
+        setModalShow(true)
+    }
 
     useFocusEffect(() => {
         if(navigation.isFocused()){
@@ -19,23 +37,40 @@ export default function Home({navigation, route}){
     })
 
     return(
-        <SafeAreaView style = {{height: Dimensions.get('screen').height - 160}}>
+        <SafeAreaView style = {{paddingTop: "15%", height: Dimensions.get('screen').height}}>
             <View style = {{alignItems: "center"}}>
                 <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: data.picture }} />
                 <Text>{data.username}</Text>
-                <View style = {{flexDirection: 'row'}}>
-                    <Text>Workouts  </Text>
-                        <Switch trackColor={'#f4f3f4'} thumbColor={'#2196F3'} value = {dataBool} onValueChange={() => {setDataBool(dataBool == 'workouts' ? 'meals':'workouts')}}/>
-                    <Text>  Recipe Book</Text>
-                    {data["workouts"].map(workout => {
-                        return(
-                            <Button title = "hi" onPress = {() => {console.log(workout)}}></Button>
-                        )
-                    })}
+                <View style = {{marginLeft: Dimensions.get('screen').width * .05, flexDirection: 'row'}}>
+                    <Text style = {{marginTop: Dimensions.get('screen').height * .015}}>Workouts  </Text>
+                        <Switch trackColor={'#f4f3f4'} thumbColor={'#2196F3'} value = {dataBool} onValueChange={() => {setDataBool(!dataBool)}}/>
+                    <Text style = {{marginTop: Dimensions.get('screen').height * .015}}> Recipe Book</Text>
                 </View>
-            <Button title = "Add Workouts" onPress = {() => {navigation.navigate("WorkoutGen", {userData: data})}}></Button>
+                <View style = {{marginVertical: 1, height: Dimensions.get('screen').height * .53}}>
+                        {!dataBool &&
+                            <FlatList data = {data["workouts"]} keyExtractor={item => item._id} renderItem={({item})=>(
+                                <Workout modalDisplay = {modalDisplayExc} workout={item}/>
+                            )} />
+                        }
+                        {dataBool &&
+                            <FlatList data = {data["meals"]} keyExtractor={item => item._id} renderItem={({item})=>(
+                                <MealInfo meal = {item}/>
+                            )} />
+                        }
+                    </View>
+                <View style = {{
+                //source: https://reactnative.dev/docs/modal
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center'}}>
+                    <Modal transparent = {true} visible = {modalShow}>
+                        <ExerciseTabInfo exercise = {modalData}/>
+                    </Modal>
+                </View>
             </View>
-            <AppNav userData = {data} navigation = {navigation}/>
+            <View style = {{bottom: 0}}>
+                <AppNav userData = {data} navigation = {navigation}/>
+            </View>
         </SafeAreaView>
     )
 

@@ -2,11 +2,11 @@ const mongoose = require('mongoose')
 
 const excSchema = new mongoose.Schema({
     id: {type: String}, //api id / generated id if user gen
-    name: {type: String, required: true},
-    force: {type: String, required: true},
-    equipment: {type: String, required: true},
-    instructions: {type: String, required: true},
-    primaryMuscleGroups: [{type: String, required: true}],
+    name: {type: String},
+    force: {type: String},
+    equipment: {type: String},
+    instructions: {type: String},
+    primaryMuscleGroups: [{type: String}],
     primaryMuscles: [{type: String}],
     secondaryMuscleGroups: [{type: String}],
     secondaryMuscles: [{type: String}],
