@@ -6,13 +6,14 @@ const mealModel = require('../models/mealModel')
 
 const router = express.Router()
 
-router.get("/getBaseUserI/:userString", (req, res) => {
-    //TODO: NEED TO REDO
-    userModel.find({username: req.params.username}).then((users) => {
-        res.json(users)
-    }).catch(function(err){
-        console.log(err)
+router.get("/getBaseUserI/:userString", async (req, res) => {
+    let userArray = []
+    const users = await userModel.find({username: {$regex: req.params.userString}})
+    users.forEach(user => {
+        userArray.push({username: user.username, picture: user.picture})
     })
+    console.log(userArray)
+    res.json(userArray)
 })
 
 router.get("/getMoreUserI/:username", async (req, res) => {

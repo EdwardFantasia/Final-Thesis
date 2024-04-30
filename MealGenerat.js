@@ -66,13 +66,13 @@ export default function WorkoutGenerat({navigation, route}){
 
 
             //TODO: check why doubles of meals are occurring and why \n still appears
-            temp = temp.concat(mealData) //get prev data and all data from old userdata (to check if any meal is already in user's meals)
+            let allTemp = temp.concat(mealData) //get prev data and all data from old userdata (to check if any meal is already in user's meals)
             console.log(JSON.stringify(temp))
             
             //MAPPING BETTER FOR TRANSFORMING, FOR EACH BETTER FOR MUTATING
             mealArray.forEach(mealData => { //for each item of meal data
                 console.log('mealData: ' + JSON.stringify(mealData))
-                if(!temp.some(data => data.id === mealData.id)){ //if data is not already in meal list
+                if(!allTemp.some(data => data.id === mealData.id)){ //if data is not already in meal list
                     console.log('passed')
                     let tempMeal = {
                         id: mealData.id,
@@ -160,7 +160,7 @@ export default function WorkoutGenerat({navigation, route}){
             </View>
             <View style = {{marginVertical: 20, height: 'auto'}}>
                 <FlatList data = {newMealData} keyExtractor={item => item.id} renderItem={({item})=>(
-                   <MealInfo addToSelected = {() => {console.log('setting deleteMeals to: '); deleteMeals.current = addGroup(deleteMeals.current, item.id); console.log('deleteMeals now set to', deleteMeals.current);}} mealData = {item}/>)}>
+                   <MealInfo hideCheck = {false} hideViewMore = {false} addToSelected = {() => {console.log('setting deleteMeals to: '); deleteMeals.current = addGroup(deleteMeals.current, item.id); console.log('deleteMeals now set to', deleteMeals.current);}} mealData = {item}/>)}>
                 </FlatList>
             </View>
             <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>

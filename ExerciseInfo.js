@@ -18,7 +18,7 @@ export default function ExerciseInfo(props){
                 <CollapsibleView style = {{width: '60%'}} title = {<Text>{exerciseItem.name}</Text>}>
                     <View>
                         <Text style = {{textAlign: "center"}}>{exerciseItem.instructions}</Text>
-                        <Text style = {{fontWeight: 'bold', textDecorationLine: 'underline'}} onPress={() => modalDisplay()} >View More</Text>
+                        <Text style = {{fontWeight: 'bold', textDecorationLine: 'underline', textAlign: 'center'}} onPress={() => modalDisplay()} >View More</Text>
                     </View>
                 </CollapsibleView>
                 {!hideSAR && 

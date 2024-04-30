@@ -211,7 +211,7 @@ export default function WorkoutModalComponent(props){
                         }
                         <Text>{create ? "What equipment do you want this exercise to use?" : "What equipment do you want to use?"}</Text>
                         <SelectList
-                            data = {["Doesn't Matter", "Barbell", "Dumbells", "Machine", "Cable", "Kettlebell", "Resistance Band", "Resistance Band Assisted", "EZ Curl Barbell", "Trap Bar", "Smith Machine", "Body Weight", "Weighted", "Misc"]}
+                            data = {["Doesn't Matter", "None", "Barbell", "Dumbells", "Machine", "Cable", "Kettlebell", "Resistance Band", "Resistance Band Assisted", "EZ Curl Barbell", "Trap Bar", "Smith Machine", "Body Weight", "Weighted", "Misc"]}
                             setSelected = {val => query.current.equipment = (val == "Doesn't Matter" ? "" : val)}
                             id = "equip"
                         ></SelectList>

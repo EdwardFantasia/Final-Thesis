@@ -112,7 +112,10 @@ export default function MealSearchModalComp(props){
                 shadowRadius: 4,
                 elevation: 5,
             }}>
-                <FlatList data = {apiResults.current} renderItem={({item: query}) => <MealInfo addToSelected = {() => setSelectedMeals(addFunc(selectedMeals, query))} mealData = {query}/>}>
+                <Pressable onPress = {() => setShow(0)} style = {{flexDirection: 'row-reverse', paddingBottom: 5}}>
+                    <Text style = {{color: '#c3c2c3', paddingBottom: .75, paddingRight: 2, padding: 1, borderStyle: "solid", borderWidth: 1, borderRadius: 10, borderColor: '#c3c2c3'}}> X</Text>
+                </Pressable>
+                <FlatList data = {apiResults.current} renderItem={({item: query}) => <MealInfo hideCheck = {false} hideViewMore = {true} addToSelected = {() => setSelectedMeals(addFunc(selectedMeals, query))} mealData = {query}/>}>
                 </FlatList>
                 <Button title = 'Add Selected Meals to Recipebook' onPress = {() => {addToMealData(selectedMeals); setShow(false)}} />
             </SafeAreaView>

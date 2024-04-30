@@ -5,12 +5,20 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox'
 export default function MealInfo(props){
     const mealDataName = props.mealData.title
     const mealDataSumm = props.mealData.summary.replace(/<[^>]*>/g, "")
+    const hideViewMore = props.hideViewMore
+    const hideCheck = props.hideCheck
+    const modalDisplay = props.modalDisplay
     return(
         <View style = {{flexDirection: 'row', justifyContent: 'center'}}>
-            <BouncyCheckbox fillColor="#2196F3" onPress = {() => props.addToSelected()}></BouncyCheckbox>
-                <CollapsibleView style = {{width: '75%'}} title = {<Text>{mealDataName}</Text>}>
+            {!hideCheck && 
+                <BouncyCheckbox fillColor="#2196F3" onPress = {() => props.addToSelected()}></BouncyCheckbox>
+            }
+                <CollapsibleView style = {{width: '70%'}} title = {<Text style = {{textAlign: 'center', fontWeight: 'bold', flexDirection: 'row', flexWrap: 'wrap', paddingRight: '2%'}}>{mealDataName}</Text>}>
                     <View>
                         <Text style = {{textAlign: "center"}}>{mealDataSumm}</Text>
+                        {!hideViewMore &&
+                            <Text style = {{fontWeight: 'bold', textDecorationLine: 'underline', textAlign: 'center'}} onPress={() => modalDisplay(props.mealData._id)}>View More</Text>
+                        }
                     </View>
                 </CollapsibleView>
         </View>

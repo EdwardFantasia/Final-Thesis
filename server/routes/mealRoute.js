@@ -4,8 +4,11 @@ const userModel = require('../models/userModel')
 
 const router = express.Router()
 
-router.get("/", (req, res) => {
-    
+router.get("/getMeal/:id", async (req, res) => {
+    const meal = await mealModel.findOne({_id: req.params.id})
+    if(meal){
+        res.json(meal)
+    }
 })
 
 router.post("/createMeal", async (req, res) => {
@@ -37,10 +40,6 @@ router.post("/createMeal", async (req, res) => {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
     }
-})
-
-router.post("/", async (req, res) => {
-    
 })
 
 module.exports = router

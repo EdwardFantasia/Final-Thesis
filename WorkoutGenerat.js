@@ -151,13 +151,13 @@ export default function WorkoutGenerat({navigation, route}){
             </View>
             <View style = {{marginVertical: 20, height: 'auto'}}>
                 <FlatList data = {newWorkData} keyExtractor={item => item.tmpListID} renderItem={({item})=>(
-                    <ExerciseInfo modalDisplay = {() => modalDisplayExc(item)} hideCheck = {false} hideSAR = {false} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
+                    <ExerciseInfo modalDisplay = {() => modalDisplayExc(item.exerciseItem)} hideCheck = {false} hideSAR = {false} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
                 </FlatList>
             </View>
             <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
                 <Button title = "Save Workout" onPress = {() => saveWorkout()} />
                 <View style = {{width: 30}}></View>
-                <Button title = "Back to Home" onPress = {() => {}} />
+                <Button title = "Cancel Creation" onPress = {() => navigation.navigate("Home", {userData: route.params.userData})} />
             </View>
             <View style = {{
                 //source: https://reactnative.dev/docs/modal
