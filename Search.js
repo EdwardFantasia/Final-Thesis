@@ -3,9 +3,10 @@ import { TextInput, View, Text, SafeAreaView, Button } from "react-native";
 import SearchedUser from "./SearchedUser";
 import { Searchbar } from "react-native-paper";
 
-export default function Search(props){
+export default function Search({navigation, route}){
     const [userString, setUserString] = useState("")
     const [userProfiles, setUserProfiles] = useState([])
+    const userData = route.params.userData
     const getUsers = async () => {
         const users = await fetch('http://10.0.2.2:3443/users/getBaseUserI/' + userString, {
             method: 'GET',
@@ -18,8 +19,20 @@ export default function Search(props){
         setUserProfiles(users)
     }
 
-    const goToAccount = (userId) => {
-        
+    const goToAccount = async (username) => {
+        if(username != userData.username){
+            let searchedData = await fetch('http://10.0.2.2:3443/users/getMoreUserI/' + username, {
+                method: 'GET',
+                mode: 'cors',
+                headers: { 'Content-Type':'application/json'}
+            }).then(function(resp){
+                return resp.json()
+            })
+            navigation.navigate("SearchedUserProf", {data: userData, searchedData: searchedData})
+        }
+        else(
+            navigation.navigate("Home", {userData: userData})
+        )
     }
 
     return(
@@ -31,7 +44,7 @@ export default function Search(props){
                 </View>
                 {userProfiles.map(user => {
                     return(
-                        <SearchedUser goToAccount = {goToAccount(user.username)} smallProfData = {user} />
+                        <SearchedUser goToAccount = {() => goToAccount(user.username)} smallProfData = {user} />
                     )
                 })}
             </View>

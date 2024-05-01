@@ -3,7 +3,7 @@ import Signup from './Signup';
 import Home from './Home'
 import MealGenerat from './MealGenerat'
 import Search from './Search'
-
+import SearchedUserProf from './SearchedUserProf';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WorkoutGenerat from './WorkoutGenerat';
@@ -22,6 +22,7 @@ export default function App() {
         <Stack.Screen name='MealGen' component={MealGenerat} />
         <Stack.Screen name='WorkoutGen' component = {WorkoutGenerat} />
         <Stack.Screen name='Search' component = {Search} />
+        <Stack.Screen name='SearchedUserProf' component={SearchedUserProf} />
       </Stack.Navigator>
     </NavigationContainer>
   );

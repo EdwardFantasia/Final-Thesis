@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, Button } from 'react-native';
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
 import BouncyCheckbox from 'react-native-bouncy-checkbox'
 
@@ -8,6 +8,9 @@ export default function MealInfo(props){
     const hideViewMore = props.hideViewMore
     const hideCheck = props.hideCheck
     const modalDisplay = props.modalDisplay
+    const searched = props.searched
+    const addMeal = props.addMeal
+    const included = props.included
     return(
         <View style = {{flexDirection: 'row', justifyContent: 'center'}}>
             {!hideCheck && 
@@ -18,6 +21,9 @@ export default function MealInfo(props){
                         <Text style = {{textAlign: "center"}}>{mealDataSumm}</Text>
                         {!hideViewMore &&
                             <Text style = {{fontWeight: 'bold', textDecorationLine: 'underline', textAlign: 'center'}} onPress={() => modalDisplay(props.mealData._id)}>View More</Text>
+                        }
+                        {searched && 
+                            <Button title = "Add to My Recipebook" color = {included ? 'green':'#2196F3'} onPress = {() => addMeal()}></Button>
                         }
                     </View>
                 </CollapsibleView>
