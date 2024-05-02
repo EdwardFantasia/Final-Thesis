@@ -45,6 +45,16 @@ export default function Home({navigation, route}){
         setModalShow(true)
     }
 
+    const editWorkout = (workout) => {
+        //TODO: need to give each workout exercise a tmpListID then navigate
+    }
+
+    //TODO: create delete methods
+
+    const deleteWorkout = async function(){}
+
+    const deleteMeal = async function(){}
+
     useFocusEffect(() => {
         if(navigation.isFocused()){
             setData(route.params.userData)
@@ -65,7 +75,7 @@ export default function Home({navigation, route}){
                 <View style = {{marginVertical: 1, height: Dimensions.get('screen').height * .53}}>
                         {!dataBool &&
                             <FlatList data = {data["workouts"]} keyExtractor={item => item._id} renderItem={({item})=>(
-                                <Workout modalDisplay = {modalDisplayExc} workout={item}/>
+                                <Workout editWorkout = {() => {navigation.navigate("WorkoutGen", {userData: data, editWorkout: item, index: data.workouts.indexOf(item)})}} modalDisplay = {modalDisplayExc} workout={item}/>
                             )} />
                         }
                         {dataBool &&

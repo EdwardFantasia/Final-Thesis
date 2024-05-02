@@ -4,6 +4,7 @@ import WorkoutModalComp from './WorkoutModalComp';
 import ExerciseInfo from './ExerciseInfo';
 import uuid from 'react-native-uuid'
 import ExerciseTabInfo from './ExerciseTabInfo';
+import { useFocusEffect } from '@react-navigation/native';
 
 //TODO: Need to create functionality to support editing preexisting workouts (can be done with checking if a newly introduced prop that holds already existing workout data is null)
 //TODO: need to fix issue with ternaries in equip attr lists
@@ -11,11 +12,13 @@ import ExerciseTabInfo from './ExerciseTabInfo';
 export default function WorkoutGenerat({navigation, route}){
     let workoutName = useRef("")
     let workoutDesc = useRef("")
-    const [newWorkData, setNewWorkData] = useState([]) //holds all data for new workout
+    let editWorkout = route.params.editWorkout
+    let userData = route.params.userData
+    const [newWorkData, setNewWorkData] = useState((editWorkout != null ? editWorkout.exercises : [])) //holds all data for new workout
     const [show, setShow] = useState(false) //variable that decides whether modal is shown
     const [moreExcInfo, setMEI] = useState(false)
     const [modalExc, setModalExc] = useState({})
-    let workoutData = route.params.userData.workouts //all workout data of user
+    let workoutData = userData.workouts //all workout data of user
     let deleteExcs = useRef([]) //useRef needs to be used or rerender would be messed up after first rerender
 
     useEffect(() => {
@@ -24,8 +27,37 @@ export default function WorkoutGenerat({navigation, route}){
     })
 
     const modalDisplayExc = (exercise) => {
+        //TODO: check if exercise has equipment value, if not, get exercise info from route
         setModalExc(exercise)
         setMEI(true)
+    }
+
+    const saveWOChanges = async () => {
+        const editBody = {
+            username: userData.username,
+            workoutName: workoutName.current, 
+            workoutDesc: workoutDesc.current, 
+            exercises: newWorkData,
+            _id: editWorkout._id,
+            index: route.params.index
+        }
+
+        let response = await fetch('http://10.0.2.2:3443/workouts/editWorkout', {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type':'application/json'},
+            body: JSON.stringify(editBody)
+        }).then(function(resp){
+            return resp.json()
+        }).catch(error => {
+            console.log(error)
+        })
+        console.log('done')
+        console.log('response: ', response)
+
+        workoutData.splice(route.params.index, 1, {workoutName: workoutName.current, workoutDesc: workoutDesc.current, exercises: response.resp})
+
+        navigation.navigate("Home", {userData: {username: userData.username, picture: userData.picture, workouts: workoutData, meals: userData.meals}})
     }
 
     const addGroup = (mutArray, arrayAdd) => {
@@ -110,7 +142,7 @@ export default function WorkoutGenerat({navigation, route}){
 
     const saveWorkout = async () => {
         const sendData = {
-            username: route.params.userData.username,
+            username: userData.username,
             workoutName: workoutName.current,
             workoutDesc: workoutDesc.current,
             exercises: newWorkData
@@ -130,7 +162,7 @@ export default function WorkoutGenerat({navigation, route}){
 
         workoutData = [...workoutData, {workoutName: workoutName.current, workoutDesc: workoutDesc.current, exercises: response.resp}]
 
-        navigation.navigate("Home", {userData: {username: route.params.userData.username, picture: route.params.userData.picture, workouts: workoutData, meals: route.params.userData.meals}})
+        navigation.navigate("Home", {userData: {username: userData.username, picture: userData.picture, workouts: workoutData, meals: userData.meals}})
 
     }
 
@@ -155,9 +187,14 @@ export default function WorkoutGenerat({navigation, route}){
                 </FlatList>
             </View>
             <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
-                <Button title = "Save Workout" onPress = {() => saveWorkout()} />
+                {editWorkout != null &&
+                    <Button title = "Save Changes" onPress = {() => saveWOChanges()} />
+                }
+                {editWorkout == null &&
+                    <Button title = "Save Workout" onPress = {() => saveWorkout()} />
+                }
                 <View style = {{width: 30}}></View>
-                <Button title = "Cancel Creation" onPress = {() => navigation.navigate("Home", {userData: route.params.userData})} />
+                <Button title = {editWorkout != null ? "Cancel Changes" : "Cancel Creation"} onPress = {() => navigation.navigate("Home", {userData: userData})} />
             </View>
             <View style = {{
                 //source: https://reactnative.dev/docs/modal
@@ -168,7 +205,7 @@ export default function WorkoutGenerat({navigation, route}){
                     <WorkoutModalComp addToWorkData = {addToWorkData} addFunc = {addGroup} setShow = {setShow}></WorkoutModalComp>
                 </Modal>
                 <Modal transparent = {true} visible = {moreExcInfo}>
-                    <ExerciseTabInfo exercise = {modalExc}/>
+                    <ExerciseTabInfo setModalShow = {setModalExc} exercise = {modalExc}/>
                 </Modal>
             </View>
         </SafeAreaView>

@@ -2,6 +2,7 @@ import { React, Component, useState, useRef} from 'react';
 import { TabView, SceneMap } from 'react-native-tab-view'
 import { View, Text, Linking, Button, Pressable } from 'react-native';
 
+//TODO: need to finish youtube linking
 export default function TabViewExample(props) {
     const exercise = props.exercise
     const FirstRoute = () => (

@@ -6,6 +6,63 @@ const userModel = require('../models/userModel')
 const router = express.Router()
 //TODO: IF THERE IS TIME, CREATE A WAY TO CHECK IF CREATED WORKOUT MATCHES AN EXC IN DB ALREADY (CHECK IF ID INCLUDES EXC365 THEN IF TRUE, CHECK ALL PARAMS EXCEPT ID)
 
+router.post("/editWorkout", async (req,res) => {
+    try {
+        const user = await userModel.findOne({ username: req.body.username })
+        if (user) {
+            let temp = []
+            let serverResp = []
+            for(let i = 0; i < req.body.exercises.length; i++){
+                let exerciseItem = req.body.exercises[i].exerciseItem
+                if(exerciseItem._id){
+                    temp.push({exerciseItem: exerciseItem._id, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps})
+                    serverResp.push({exerciseItem: {_id: exerciseItem._id, name: exerciseItem.name, instructions: exerciseItem.instructions}, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps})
+                }
+                else{
+                    let exerciseID = ""
+                    let newExc
+                    if(!Array.isArray(exerciseItem)){
+                        let exerciseFind = await excModel.findOne({ id: exerciseItem.id })
+                        if(exerciseFind){
+                            exerciseID = exerciseFind._id
+                        } else{
+                            newExc = await excModel.create(exerciseItem)
+                            exerciseID = newExc._id
+                        }
+                        temp.push({exerciseItem: exerciseID, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps})
+                        serverResp.push({exerciseItem: {_id: exerciseID, name: exerciseItem.name, instructions: exerciseItem.instructions}, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps})
+                    }else{
+                        let tmpRand = []
+                        let randServArr = []
+                        for(let j = 0; j < exerciseItem.length; j++){
+                            let exerciseFind = await excModel.findOne({id: exerciseItem[j].id})
+                            if(exerciseFind){
+                                exerciseID = exerciseFind._id
+                            }else{
+                                newExc = await excModel.create(exerciseItem[j])
+                                exerciseID = newExc._id
+                            }
+                            tmpRand.push(exerciseID)
+                            randServArr.push({_id: exerciseID, name: exerciseItem[j].name, instructions: exerciseItem[j].instructions})
+                        }
+                        temp.push({exerciseItem: tmpRand, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
+                        serverResp.push({exerciseItem: randServArr, sets: req.body.exercises[i].sets, reps: req.body.exercises[i].reps })
+                    } 
+                }
+            }
+            console.log(JSON.stringify(temp))
+            const workout = await workoutModel.create({ workoutName: req.body.workoutName, workoutDesc: req.body.workoutDesc, exercises: temp })
+            console.log(JSON.stringify(workout))
+            user.workouts.splice(req.body.index, 1, workout)
+            await user.save()
+            res.json({resp: serverResp})
+        }
+    } catch(error){
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+})
+
 router.post("/createWorkout", async (req, res) => {
     //TRY TO REWRITE
     try {
