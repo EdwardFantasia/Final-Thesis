@@ -52,8 +52,6 @@ export default function WorkoutGenerat({navigation, route}){
         }).catch(error => {
             console.log(error)
         })
-        console.log('done')
-        console.log('response: ', response)
 
         workoutData.splice(route.params.index, 1, {workoutName: workoutName.current, workoutDesc: workoutDesc.current, exercises: response.resp})
 
@@ -166,6 +164,19 @@ export default function WorkoutGenerat({navigation, route}){
 
     }
 
+    const setSetsOrReps = function(sor, index, num){
+        setNewWorkData(prevWorkData => {
+            let tmp = [...prevWorkData]
+            if(sor){
+                tmp.splice(index, 1, {exerciseItem: tmp[index].exerciseItem, sets: num, reps: tmp[index].reps})
+            }
+            else{
+                tmp.splice(index, 1, {exerciseItem: tmp[index].exerciseItem, sets: tmp[index].sets, reps: num})
+            }
+            return tmp
+        })
+    }
+
     return(
         <SafeAreaView style = {{paddingTop: '15%'}}>
             <View style = {{alignItems: 'center'}}>
@@ -182,8 +193,8 @@ export default function WorkoutGenerat({navigation, route}){
                 <Button title = "Delete Selected" onPress = {() => removeExercises()} />
             </View>
             <View style = {{marginVertical: 20, height: 'auto'}}>
-                <FlatList data = {newWorkData} keyExtractor={item => item.tmpListID} renderItem={({item})=>(
-                    <ExerciseInfo modalDisplay = {() => modalDisplayExc(item.exerciseItem)} hideCheck = {false} hideSAR = {false} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
+                <FlatList data = {newWorkData} keyExtractor={item => item.tmpListID} renderItem={({item, index})=>(
+                    <ExerciseInfo index = {index} setSetsOrReps = {setSetsOrReps} modalDisplay = {() => modalDisplayExc(item.exerciseItem)} hideCheck = {false} hideSAR = {false} addToSelected = {() => {console.log('setting deleteExcs to: '); deleteExcs.current = addGroup(deleteExcs.current, item.tmpListID); console.log('deleteExcs now set to', deleteExcs.current);}} exerciseData = {item.exerciseItem}/>)}>
                 </FlatList>
             </View>
             <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>

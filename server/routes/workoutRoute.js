@@ -6,6 +6,21 @@ const userModel = require('../models/userModel')
 const router = express.Router()
 //TODO: IF THERE IS TIME, CREATE A WAY TO CHECK IF CREATED WORKOUT MATCHES AN EXC IN DB ALREADY (CHECK IF ID INCLUDES EXC365 THEN IF TRUE, CHECK ALL PARAMS EXCEPT ID)
 
+router.post("/deleteWorkout", async (req, res) => {
+    try {
+        console.log()
+        const user = await userModel.findOne({ username: req.body.username })
+        if (user){
+            user.workouts.splice(req.body.index, 1)
+            await user.save()
+            res.json({success: true})
+        }
+    }catch(err){
+        console.log()
+        res.json({success: false})
+    }
+})
+
 router.post("/editWorkout", async (req,res) => {
     try {
         const user = await userModel.findOne({ username: req.body.username })

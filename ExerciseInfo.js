@@ -9,6 +9,7 @@ export default function ExerciseInfo(props){
     const hideSAR = props.hideSAR
     const modalDisplay = props.modalDisplay
     const prof = props.prof
+    const setSetsOrReps = props.setSetsOrReps
 
     return(
         <View style = {{flexDirection: 'row', justifyContent: 'center'}}>
@@ -25,11 +26,11 @@ export default function ExerciseInfo(props){
                     <View style = {{flexDirection: 'row', marginBottom: 5}}>
                         <View style = {{flexDirection: 'column', marginRight: 7.5}}>
                             <Text>Sets</Text>
-                            <TextInput maxLength = {3} style = {{borderStyle: "solid", borderWidth: 1, borderRadius: 5, textAlign: 'center'}} keyboardType="numeric"></TextInput>
+                            <TextInput placeholder = {props.sets} onChangeText = {text => setSetsOrReps(true, props.index, text)} maxLength = {3} style = {{borderStyle: "solid", borderWidth: 1, borderRadius: 5, textAlign: 'center'}} keyboardType="numeric"></TextInput>
                         </View>
                         <View style = {{flexDirection: 'column'}}>
                             <Text>Reps</Text>
-                            <TextInput maxLength = {3} style = {{borderStyle: "solid", borderWidth: 1, borderRadius: 5, textAlign: 'center'}} keyboardType="numeric"></TextInput>
+                            <TextInput placeholder={props.reps} onChangeText = {text => setSetsOrReps(false, props.index, text)} maxLength = {3} style = {{borderStyle: "solid", borderWidth: 1, borderRadius: 5, textAlign: 'center'}} keyboardType="numeric"></TextInput>
                         </View>
                     </View>
                 }

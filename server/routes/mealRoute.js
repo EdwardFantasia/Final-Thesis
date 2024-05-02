@@ -11,6 +11,21 @@ router.get("/getMeal/:id", async (req, res) => {
     }
 })
 
+router.post("/deleteMeal", async (req, res) => {
+    try {
+        console.log()
+        const user = await userModel.findOne({ username: req.body.username })
+        if (user){
+            user.meals.splice(req.body.index, 1)
+            await user.save()
+            res.json({success: true})
+        }
+    }catch(err){
+        console.log()
+        res.json({success: false})
+    }
+})
+
 router.post("/createMeal", async (req, res) => {
     try {
         const user = await userModel.findOne({ username: req.body.username })

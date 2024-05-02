@@ -1,7 +1,7 @@
 import { React, Component, useEffect, useState} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import Workout from './Workout';
-import { Modal, SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button, Dimensions} from 'react-native';
+import { Alert, Modal, SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button, Dimensions} from 'react-native';
 import MealInfo from './MealInfo.js'
 import ExerciseInfo from './ExerciseInfo';
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
@@ -49,11 +49,56 @@ export default function Home({navigation, route}){
         //TODO: need to give each workout exercise a tmpListID then navigate
     }
 
-    //TODO: create delete methods
+    const deleteWorkout = async function(index){
+        let body = {
+            username: data.username,
+            index: index
+        }
+        let response = await fetch('http://10.0.2.2:3443/workouts/deleteWorkout', {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type':'application/json'},
+            body: JSON.stringify(body)
+            }
+        ).then(function(resp){
+            return resp.json()
+        }).catch(error => {
+            console.log(error)
+            Alert.alert("There was an error")
+        })
 
-    const deleteWorkout = async function(){}
+        setData(prevData => {
+            let tmpWorkouts = prevData.workouts
+            tmpWorkouts.splice(index, 1)
+            return {username: data.username, picture: data.picture, workouts: tmpWorkouts, meals: data.meals}
+        }) 
 
-    const deleteMeal = async function(){}
+    }
+
+    const deleteMeal = async function(index){
+        let body = {
+            username: data.username,
+            index: index
+        }
+        let response = await fetch('http://10.0.2.2:3443/meals/deleteMeal', {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type':'application/json'},
+            body: JSON.stringify(body)
+            }
+        ).then(function(resp){
+            return resp.json()
+        }).catch(error => {
+            console.log(error)
+            Alert.alert("There was an error")
+        })
+
+        setData(prevData => {
+            let tmpMeals = prevData.meals
+            tmpMeals.splice(index, 1)
+            return {username: data.username, picture: data.picture, workouts: data.workouts, meals: tmpMeals}
+        }) 
+    }
 
     useFocusEffect(() => {
         if(navigation.isFocused()){
@@ -74,13 +119,13 @@ export default function Home({navigation, route}){
                 </View>
                 <View style = {{marginVertical: 1, height: Dimensions.get('screen').height * .53}}>
                         {!dataBool &&
-                            <FlatList data = {data["workouts"]} keyExtractor={item => item._id} renderItem={({item})=>(
-                                <Workout editWorkout = {() => {navigation.navigate("WorkoutGen", {userData: data, editWorkout: item, index: data.workouts.indexOf(item)})}} modalDisplay = {modalDisplayExc} workout={item}/>
+                            <FlatList data = {data["workouts"]} keyExtractor={item => item._id} renderItem={({item, index})=>(
+                                <Workout deleteWorkout = {() => deleteWorkout(index)} editWorkout = {() => {navigation.navigate("WorkoutGen", {userData: data, editWorkout: item, index: data.workouts.indexOf(item)})}} modalDisplay = {modalDisplayExc} workout={item}/>
                             )} />
                         }
                         {dataBool &&
-                            <FlatList data = {data["meals"]} keyExtractor={item => item._id} renderItem={({item})=>(
-                                <MealInfo modalDisplay = {modalDisplayMeal} hideViewMore = {false} hideCheck = {true} mealData = {item}/>
+                            <FlatList data = {data["meals"]} keyExtractor={item => item._id} renderItem={({item, index})=>(
+                                <MealInfo deleteMeal = {() => deleteMeal(index)} prof = {true} modalDisplay = {modalDisplayMeal} hideViewMore = {false} hideCheck = {true} mealData = {item}/>
                             )} />
                         }
                     </View>
