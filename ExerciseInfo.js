@@ -3,7 +3,8 @@ import {View, Text, TextInput, Pressable} from 'react-native'
 import BouncyCheckbox from 'react-native-bouncy-checkbox'
 
 export default function ExerciseInfo(props){
-    const exerciseItem = props.exerciseData
+    const exerciseItem = (Array.isArray(props.exerciseData) ? props.exerciseData[Math.floor(Math.random() * props.exerciseData.length)] : props.exerciseData)
+    const color = ((Array.isArray(props.exerciseData) || props.isArray) ? "#2196F3" : 'black')
     const addToSelected = props.addToSelected
     const hideCheck = props.hideCheck
     const hideSAR = props.hideSAR
@@ -16,10 +17,12 @@ export default function ExerciseInfo(props){
                 {!hideCheck && 
                     <BouncyCheckbox fillColor="#2196F3" onPress = {() => addToSelected()}></BouncyCheckbox>
                 }
-                <CollapsibleView style = {{width: '60%'}} title = {<Text>{exerciseItem.name}</Text>}>
+                <CollapsibleView style = {{width: '60%'}} title = {<Text style = {{color: color}}>{exerciseItem.name}</Text>}>
                     <View>
                         <Text style = {{textAlign: "center"}}>{exerciseItem.instructions}</Text>
-                        <Text style = {{fontWeight: 'bold', textDecorationLine: 'underline', textAlign: 'center'}} onPress={() => modalDisplay()} >View More</Text>
+                        {props.displayViewMore &&
+                            <Text style = {{fontWeight: 'bold', textDecorationLine: 'underline', textAlign: 'center'}} onPress={() => modalDisplay()} >View More</Text>
+                        }
                     </View>
                 </CollapsibleView>
                 {!hideSAR && 

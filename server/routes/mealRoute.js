@@ -5,10 +5,12 @@ const userModel = require('../models/userModel')
 const router = express.Router()
 
 router.get("/getMeal/:id", async (req, res) => {
+    try{
     const meal = await mealModel.findOne({_id: req.params.id})
     if(meal){
         res.json(meal)
     }
+}catch(err){}
 })
 
 router.post("/deleteMeal", async (req, res) => {

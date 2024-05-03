@@ -7,6 +7,7 @@ import SearchedUserProf from './SearchedUserProf';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WorkoutGenerat from './WorkoutGenerat';
+import Settings from './Settings'
 
 import { StyleSheet } from 'react-native';
 
@@ -23,6 +24,7 @@ export default function App() {
         <Stack.Screen name='WorkoutGen' component = {WorkoutGenerat} />
         <Stack.Screen name='Search' component = {Search} />
         <Stack.Screen name='SearchedUserProf' component={SearchedUserProf} />
+        <Stack.Screen name='Settings' component = {Settings}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

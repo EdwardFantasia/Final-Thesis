@@ -25,7 +25,10 @@ export default function MealInfo(props){
                             <Text style = {{fontWeight: 'bold', textDecorationLine: 'underline', textAlign: 'center'}} onPress={() => modalDisplay(props.mealData._id)}>View More</Text>
                         }
                         {prof &&
+                        <View>
+                            <Text />
                             <Button color = "red" title = "Delete Meal" onPress = {() => deleteMeal()} />
+                            </View>
                         }
                         {searched && 
                             <Button title = "Add to My Recipebook" color = {included ? 'green':'#2196F3'} onPress = {() => addMeal()}></Button>

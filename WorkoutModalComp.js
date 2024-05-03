@@ -173,6 +173,7 @@ export default function WorkoutModalComponent(props){
                 </Pressable>
                 <View style = {{alignItems: 'center'}}>
                     <Button title = "Create Exercise" onPress={() => {setCreate(true); setScreen(1)}} />
+                    <Text style = {{paddingVertical: '20%'}}></Text>
                     <Button title = "Import Exercises" onPress={() => setScreen(1)} />
                 </View>
             </SafeAreaView>
@@ -232,8 +233,8 @@ export default function WorkoutModalComponent(props){
 
                         <Text>{create ? "What force does this exericse use?" : "What force do you wish to use for this exercise?"}</Text>
                         <SelectList
-                            data = {[create ? "N/A" : "Doesn't Matter", "Push", "Pull", "Push and Pull"]}
-                            setSelected = {val => query.current.force = (val == "Doesn't Matter" || "N/A" ? "" : val)}
+                            data = {["Doesn't Matter", "Push", "Pull", "Push and Pull"]}
+                            setSelected = {val => query.current.force = (val == "Doesn't Matter" ? "" : val)}
                             id = "force"
                         ></SelectList>
                         <Text> {'\n'}</Text>
@@ -297,13 +298,13 @@ export default function WorkoutModalComponent(props){
 
                         <Text>{create ? "What type of exercise is this?" : "Please select the type of exercise you want to search for"}</Text>
 
-                        <SelectList data = {[create ? "N/A" : "Doesn't Matter", "Compound", "Isolation"]}
-                                    setSelected = {val => query.current.type = (val == "Doesn't Matter" || "N/A" ? "" : val)}
+                        <SelectList data = {["Doesn't Matter", "Compound", "Isolation"]}
+                                    setSelected = {val => query.current.type = (val == "Doesn't Matter" ? "" : val)}
                                     id = 'type'
                         ></SelectList>
 
                         {!create && 
-                        <View>
+                        <View style = {{alignContent: 'center', justifyContent: 'center'}}>
                             <Text>{'\n'}</Text>
 
                             <Text>Randomize Exercise</Text>

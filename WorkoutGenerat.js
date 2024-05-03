@@ -6,13 +6,14 @@ import uuid from 'react-native-uuid'
 import ExerciseTabInfo from './ExerciseTabInfo';
 import { useFocusEffect } from '@react-navigation/native';
 
-//TODO: Need to create functionality to support editing preexisting workouts (can be done with checking if a newly introduced prop that holds already existing workout data is null)
+//TODO: why is extendedmodal not working (scrap ok)
 //TODO: need to fix issue with ternaries in equip attr lists
 
+
 export default function WorkoutGenerat({navigation, route}){
-    let workoutName = useRef("")
-    let workoutDesc = useRef("")
     let editWorkout = route.params.editWorkout
+    let workoutName = useRef((editWorkout != null ? editWorkout.workoutName : ""))
+    let workoutDesc = useRef((editWorkout != null ? editWorkout.workoutName : ""))
     let userData = route.params.userData
     const [newWorkData, setNewWorkData] = useState((editWorkout != null ? editWorkout.exercises : [])) //holds all data for new workout
     const [show, setShow] = useState(false) //variable that decides whether modal is shown
@@ -27,7 +28,6 @@ export default function WorkoutGenerat({navigation, route}){
     })
 
     const modalDisplayExc = (exercise) => {
-        //TODO: check if exercise has equipment value, if not, get exercise info from route
         setModalExc(exercise)
         setMEI(true)
     }
@@ -178,7 +178,7 @@ export default function WorkoutGenerat({navigation, route}){
     }
 
     return(
-        <SafeAreaView style = {{paddingTop: '15%'}}>
+        <SafeAreaView style = {{paddingTop: '15%',}}>
             <View style = {{alignItems: 'center'}}>
                 <Text>Workout Name</Text>
                 <TextInput style = {{width: 300, borderStyle: "solid", borderWidth: 1, borderRadius: 10, textAlign: 'center'}} onChangeText = {text => workoutName.current = text} id = 'workName'></TextInput>

@@ -2,7 +2,6 @@ import { React, Component, useState, useRef} from 'react';
 import { TabView, SceneMap } from 'react-native-tab-view'
 import { View, Text, Linking, Button, Pressable } from 'react-native';
 
-//TODO: need to finish youtube linking
 export default function TabViewExample(props) {
     const exercise = props.exercise
     const FirstRoute = () => (
@@ -25,37 +24,37 @@ export default function TabViewExample(props) {
                     <Text style = {{textDecorationLine: 'underline'}}>Primary Muscle Groups</Text>
                     {exercise.primaryMuscleGroups.map(pmg => {
                         return(
-                            <Text>{'\u2B24'} {pmg}</Text>
+                            <Text><Text style = {{fontSize: 5}}>{'\u2B24'}  </Text>{pmg}</Text>
                         )
                     })}
                     <Text style = {{textDecorationLine: 'underline'}}>Primary Muscles</Text>
                     {exercise.primaryMuscles.map(pm => {
                         return(
-                            <Text>{'\u2B24'} {pm}</Text>
+                            <Text><Text style = {{fontSize: 5}}>{'\u2B24'}  </Text>{pm}</Text>
                         )
                     })}
                     <Text style = {{textDecorationLine: 'underline'}}>Secondary Muscle Groups</Text>
                     {exercise.secondaryMuscleGroups.map(smg => {
                         return(
-                            <Text>{'\u2B24'} {smg}</Text>
+                            <Text><Text style = {{fontSize: 5}}>{'\u2B24'}  </Text>{smg}</Text>
                         )
                     })}
                     <Text style = {{textDecorationLine: 'underline'}}>Secondary Muscles</Text>
                     {exercise.secondaryMuscles.map(sm => {
                         return(
-                            <Text>{'\u2B24'} {sm}</Text>
+                            <Text><Text style = {{fontSize: 5}}>{'\u2B24'}  </Text>{sm}</Text>
                         )
                     })}
                     <Text style = {{textDecorationLine: 'underline'}}>Tags</Text>
                     {exercise.tags.map(tag => {
                         return(
-                            <Text>{'\u2B24'} {tag}</Text>
+                            <Text><Text style = {{fontSize: 5}}>{'\u2B24'}  </Text>{tag}</Text>
                         )
                     })}
                 </View>
             </View>
-            <View style = {{marginTop: '15%'}}>
-                <Button color = {"red"} onPress = {() => {}} title = "View Demonstrations on YouTube" />
+            <View style = {{absolute: '3%'}}>
+                <Button color = {"red"} onPress = {() => {Linking.openURL('https://www.youtube.com/results?search_query=' + exercise.equipment.replace(" ", "+") + "+" + exercise.name.replace(" ", "+"))}} title = "View Demonstrations on YouTube" />
             </View>
         </View>
     );

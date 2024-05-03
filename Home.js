@@ -1,17 +1,17 @@
 import { React, Component, useEffect, useState} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import Workout from './Workout';
-import { Alert, Modal, SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button, Dimensions} from 'react-native';
+import { Alert, Modal, SafeAreaView, View, Image, Text, Switch, StyleSheet, TouchableOpacity, FlatList, Button, Dimensions, Pressable} from 'react-native';
 import MealInfo from './MealInfo.js'
 import ExerciseInfo from './ExerciseInfo';
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
 import AppNav from "./AppNav.js"
 import ExerciseTabInfo from './ExerciseTabInfo.js';
 import MealTabInfo from './MealTabInfo.js'
+import uuid from 'react-native-uuid'
 
 export default function Home({navigation, route}){
     const [dataBool, setDataBool] = useState(false)
-    const [deleteMode, setDeleteMode] = useState(false)
     const [data, setData] = useState(route.params.userData) //holds username, meals, pfp, and workouts
     const [modalShow, setModalShow] = useState(false)
     const [modalData, setModalData] = useState({})
@@ -46,7 +46,17 @@ export default function Home({navigation, route}){
     }
 
     const editWorkout = (workout) => {
-        //TODO: need to give each workout exercise a tmpListID then navigate
+        let tmpWorkout = workout
+        let tmpExcs = []
+        let tmpExc = {}
+        
+        tmpWorkout.exercises.forEach(exercise => {
+            tmpExc = exercise
+            tmpExc.tmpListID = uuid.v4()
+            tmpExcs.push(tmpExc)
+        })
+
+        navigation.navigate("WorkoutGen", {userData: data, editWorkout: tmpWorkout, index: data.workouts.indexOf(workout)})
     }
 
     const deleteWorkout = async function(index){
@@ -110,7 +120,9 @@ export default function Home({navigation, route}){
     return(
         <SafeAreaView style = {{paddingTop: "15%", height: Dimensions.get('screen').height}}>
             <View style = {{alignItems: "center"}}>
-                <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: data.picture }} />
+                <Pressable onPress = {() => navigation.navigate("Settings", {userData: data})}>
+                    <Image style = {{width: 165, height: 165, borderRadius: 165 / 2, overflow: "hidden", borderColor: "black", borderWidth: .6}} source = {{ uri: data.picture }} />
+                </Pressable>
                 <Text style = {{fontWeight: 'bold', fontSize: 18}}>{data.username}</Text>
                 <View style = {{marginLeft: Dimensions.get('screen').width * .05, flexDirection: 'row'}}>
                     <Text style = {{marginTop: Dimensions.get('screen').height * .015}}>Workouts </Text>
@@ -120,7 +132,7 @@ export default function Home({navigation, route}){
                 <View style = {{marginVertical: 1, height: Dimensions.get('screen').height * .53}}>
                         {!dataBool &&
                             <FlatList data = {data["workouts"]} keyExtractor={item => item._id} renderItem={({item, index})=>(
-                                <Workout deleteWorkout = {() => deleteWorkout(index)} editWorkout = {() => {navigation.navigate("WorkoutGen", {userData: data, editWorkout: item, index: data.workouts.indexOf(item)})}} modalDisplay = {modalDisplayExc} workout={item}/>
+                                <Workout deleteWorkout = {() => deleteWorkout(index)} editWorkout = {() => editWorkout(item)} modalDisplay = {modalDisplayExc} workout={item}/>
                             )} />
                         }
                         {dataBool &&

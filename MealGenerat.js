@@ -160,7 +160,7 @@ export default function WorkoutGenerat({navigation, route}){
             </View>
             <View style = {{marginVertical: 20, height: 'auto'}}>
                 <FlatList data = {newMealData} keyExtractor={item => item.id} renderItem={({item})=>(
-                   <MealInfo hideCheck = {false} hideViewMore = {false} addToSelected = {() => {console.log('setting deleteMeals to: '); deleteMeals.current = addGroup(deleteMeals.current, item.id); console.log('deleteMeals now set to', deleteMeals.current);}} mealData = {item}/>)}>
+                   <MealInfo hideCheck = {false} hideViewMore = {true} addToSelected = {() => {console.log('setting deleteMeals to: '); deleteMeals.current = addGroup(deleteMeals.current, item.id); console.log('deleteMeals now set to', deleteMeals.current);}} mealData = {item}/>)}>
                 </FlatList>
             </View>
             <View style = {{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>

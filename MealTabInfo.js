@@ -14,6 +14,7 @@ export default function TabViewExample(props) {
             </Pressable>
             <ScrollView style = {{height: 'auto', marginBottom: "10%"}}>
                 <View style = {{alignItems: 'center'}}>
+                    <Image style = {{width: 312, height: 231}} source = {{uri: 'https://img.spoonacular.com/recipes/' + String(meal.id) + '-312x231.' + String(meal.imageType)}}></Image>
                     <Text style = {{textDecorationLine: 'underline'}}>Name</Text>
                     <Text>{meal.title}</Text>
                     <Text style = {{textDecorationLine: 'underline'}}>Summary</Text>
@@ -24,7 +25,6 @@ export default function TabViewExample(props) {
                     <Text>{meal.readyInMinutes} minutes</Text>
                     <Text style = {{textDecorationLine: 'underline'}}>Servings</Text>
                     <Text>{meal.servings}</Text>
-                    <Image></Image>
                 </View>
             </ScrollView>
         </View>
@@ -35,49 +35,52 @@ export default function TabViewExample(props) {
             <Pressable onPress = {() => props.setModalShow(0)} style = {{paddingBottom: 5}}>
                 <Text style = {{color: '#c3c2c3', paddingBottom: .75, paddingRight: 2, padding: 1, borderStyle: "solid", borderWidth: 1, borderRadius: 10, borderColor: '#c3c2c3'}}> X</Text>
             </Pressable>
-            <View style = {{flexDirection: 'row'}}>
-                <View style = {{flexDirection: 'column'}}>
+            <View style = {{justifyContent: 'center', flexDirection: 'row'}}>
+                <View style = {{alignContent: 'center', flexDirection: 'column'}}>
+                    <Text style = {{fontSize: 20,textDecorationLine: 'underline'}}>Equipment</Text>
+                    <ScrollView>                   
                     {equipmentArray.map(equip => {
+                        let imgWidth, imgHeight
+                        const image = Image.getSize(equip.image, (width, height) => {
+                            imgWidth = width
+                            imgHeight = height
+                        })
                         return(
-                            <View>
-                                <Text>{equip.name}</Text>
-                                <Image source = {{}}/>
+                            <View style = {{width: 200}}>
+                                <Text style = {{fontSize: 15}}><Text style = {{fontSize: 5}}>{'\u2B24'}  </Text>{equip.name}</Text>
+                                <Image resizeMode = 'contain' style = {{overflow: 'visible', width: 100, height: 100}} source = {{uri: equip.image}}/>
                             </View>
                         )
                     })}
+                    </ScrollView>
                 </View>
+                <View style = {{paddingHorizontal: '3%'}}/>
                 <View style = {{flexDirection: 'column'}}>
+                    <Text style = {{fontSize: 20, textDecorationLine: 'underline'}}>Ingredients</Text>
+                    <ScrollView style = {{marginBottom: '20%'}}>
                     {ingredArray.map(ingred => {
                         return(
                             <View>
-                                <Text>{ingred.name}</Text>
-                                <Image source = {{}}/>
+                                <Text style = {{fontSize: 15, width: 80, flexWrap: 'wrap'}}><Text style = {{fontSize: 5}}>{'\u2B24'}  </Text>{ingred.name}</Text>
+                                <Image resizeMode = 'contain' style = {{overflow: 'visible', width: 100, height: 100}} source = {{uri: 'https://img.spoonacular.com/ingredients_100x100/' + ingred.image}}/>
                             </View>
-
                         )
                     })}
+                    </ScrollView>
                 </View>
             </View>
         </View>
     )
-
-    const NutritionRoute = () => {
-        <View>
-            <Image source = {{uri: meal.nutrition}}></Image>
-        </View>
-    }
       
       const renderScene = SceneMap({
         first: GenInfRoute,
-        second: EquipAndIngredRoute,
-        third: NutritionRoute
+        second: EquipAndIngredRoute
       });
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'first', title: 'General Information' },
-    { key: 'second', title: 'Ingredients & Equipment' },
-    { key: 'third', title: 'Nutritional Information' }
+    { key: 'second', title: 'Ingredients & Equipment' }
   ]);
 
   return (
@@ -92,7 +95,7 @@ export default function TabViewExample(props) {
             },
             shadowOpacity: 0.25,
             shadowRadius: 4,
-            elevation: 5,}}
+            elevation: 5}}
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={setIndex}

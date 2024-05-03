@@ -69,6 +69,16 @@ router.get("/getMoreUserI/:username", async (req, res) => {
     }
 })
 
+router.post('/editUsername', async (req, res) => {
+    
+        const user = userModel.findOne({username: req.body.username})
+        if(user){
+            user.username = req.body.newUsername
+            await user.save()
+            res.json({username: req.body.newUsername})
+        }
+})
+
 router.patch("/setPic", async (req, res) => {
     console.log(req.body.username)
     var patchUser = await userModel.findOne({username: req.body.username})
@@ -82,7 +92,7 @@ router.patch("/setPic", async (req, res) => {
 })
 
 router.post("/signIn", async (req, res) => {
-    //TODO: try to remove for loop
+    try{
     console.log("body: ", req.body)
     const user = await userModel.findOne({$or: [{email: req.body.login1}, {username: req.body.login1}], password: req.body.password})
     if(user){
@@ -134,9 +144,12 @@ router.post("/signIn", async (req, res) => {
         console.log("responding with: ", temp)
         res.json({username: user.username, picture: user.picture, workouts: temp, meals: tempMeals})
     }
+}
+catch(err){}
 })
 
 router.post("/createUser", async (req, res) => {
+    try{
     console.log("body: ", req.body)
     userModel.create(req.body)
     .then(async (result, err) => {
@@ -148,9 +161,11 @@ router.post("/createUser", async (req, res) => {
             res.send(err)
         }
     })
+}catch(err){}
 })
 
 router.post("/addMealsAndWorkouts", async (req,res) => {
+    try{
     console.log('accessed')
     const user = await userModel.findOne({username: req.body.username})
     if(user){
@@ -164,6 +179,7 @@ router.post("/addMealsAndWorkouts", async (req,res) => {
         await user.save()
         res.json({success: true})
     }
+}catch(err){}
 })
 
 module.exports = router

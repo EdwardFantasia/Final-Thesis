@@ -1,9 +1,12 @@
 //use of route source: https://www.youtube.com/watch?v=GkH_VeAeur8
 
 import { React, useRef, useState} from 'react';
-import { Image, Button, Text, TextInput, SafeAreaView, View } from 'react-native';
+import { Image, Button, Text, TextInput, SafeAreaView, View, Alert } from 'react-native';
 import { firebaseStorage } from './firebaseConfig'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import {firebaseAuth} from './firebaseConfig'
+import {firebaseApp} from './firebaseConfig'
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification} from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
 
@@ -41,7 +44,6 @@ export default function Signup({navigation, route}){
 
     const signUpUser = async() => {  
         //TODO: create firebase auth code that, if activated, then executes code below
-        
         let response = await fetch('http://10.0.2.2:3443/users/createUser', {
             method: 'POST',
             mode: 'cors',
