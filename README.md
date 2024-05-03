@@ -5,7 +5,7 @@ Exercise365 is a React Native application using the MERN + Firebase Stack.
       <li>NodeJS</li>
       <li><a href = "https://www.youtube.com/watch?v=DFbhpQpqyuo">Android Studio</a></li>
       <ul>
-        <li>This app runs best when a Pixel 8 is the device being emulated, here is a video to help with setup.</li>
+        <li>This app runs best when a Pixel 8 is the device being emulated</li>
       </ul>
       <li>MongoDB</li>
     </ul>
