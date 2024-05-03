@@ -3,7 +3,7 @@ Exercise365 is a React Native application using the MERN + Firebase Stack.
   <li>In order to run Exercise365, one must have the following programs installed:
     <ul>
       <li>NodeJS</li>
-      <a href = "https://www.youtube.com/watch?v=DFbhpQpqyuo"><li>Android Studio</li></a>
+      <li><a href = "https://www.youtube.com/watch?v=DFbhpQpqyuo">Android Studio</a></li>
       <ul>
         <li>This app runs best when a Pixel 8 is the device being emulated, here is a video to help with setup.</li>
       </ul>
